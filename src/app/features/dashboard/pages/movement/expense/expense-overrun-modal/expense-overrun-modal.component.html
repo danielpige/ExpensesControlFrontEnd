@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Presupuesto sobregirado</h2>
+
+<mat-dialog-content class="py-3 px-4">
+  <p>Tu presupuesto se excedió en los siguientes tipos de gastos:</p>
+
+  <div class="table-responsive">
+    <table class="table table-sm table-striped">
+      <thead>
+        <tr>
+          <th>Tipo de gasto</th>
+          <th>Presupuesto</th>
+          <th>Ejecutado</th>
+          <th>Sobregirado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let o of data.overruns">
+          <td>{{ o.ExpenseTypeName }}</td>
+          <td>{{ o.BudgetAmount | number : '1.2-2' }}</td>
+          <td>{{ o.ExecutedAmount | number : '1.2-2' }}</td>
+          <td class="text-danger">
+            {{ o.OverrunAmount | number : '1.2-2' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" mat-dialog-close>OK</button>
+</mat-dialog-actions>

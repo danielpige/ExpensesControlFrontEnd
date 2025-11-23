@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>
+  {{ data ? 'Editar fondo' : 'Crear fondo' }}
+</h2>
+
+<mat-dialog-content class="py-2" [formGroup]="form">
+  <div class="row">
+    <div class="col-12 mb-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="Name" />
+        <mat-error> El nombre es requerido. </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="col-md-12 mb-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Tipo de cuenta</mat-label>
+        <mat-select formControlName="AccountType">
+          @for (type of accountTypes; track type) {
+          <mat-option [value]="type">{{ accountTypeEs[type] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 mb-3">
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label *ngIf="!data">Balance inicial</mat-label>
+        <mat-label *ngIf="data">Saldo actual</mat-label>
+        <input type="number" [readonly]="data ? true : false" matInput formControlName="InitialBalance" />
+        <mat-hint>{{ InitialBalance?.value | number : '1.2-2' }}</mat-hint>
+        <mat-error> El balance inicial es requerido. </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="col-12 mb-3" *ngIf="data">
+      <mat-slide-toggle formControlName="IsActive"> Activo </mat-slide-toggle>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()">Guardar cambios</button>
+</mat-dialog-actions>

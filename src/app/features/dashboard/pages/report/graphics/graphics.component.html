@@ -1,0 +1,65 @@
+<div class="d-flex justify-content-between align-items-center mb-3 mt-3 mx-3">
+  <h2>Gráficos</h2>
+</div>
+
+<mat-divider></mat-divider>
+
+<form clas="mt-4 mx-4" [formGroup]="form" (ngSubmit)="onSearch()">
+  <mat-card class="mb-3 mt-4 mx-4 p-4">
+    <div class="row">
+      <div class="col-md-3 mb-2">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Ingresar rango de fecha</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate formControlName="fromDate" placeholder="Fecha inicial" />
+            <input matEndDate formControlName="toDate" placeholder="Fecha final" />
+          </mat-date-range-input>
+          <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-3 mb-2">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Tipo de gráfico</mat-label>
+          <mat-select formControlName="chartType">
+            <mat-option value="bar">Barra</mat-option>
+            <mat-option value="line">Linea</mat-option>
+            <mat-option value="pie">Pie</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-md-1 mb-2 text-end">
+        <button mat-raised-button color="primary" type="submit">Cargar</button>
+      </div>
+    </div>
+  </mat-card>
+</form>
+
+<div class="row">
+  <div class="col-md-6">
+    <mat-card class="mx-4 p-4" *ngIf="chartData">
+      <app-generic-chart [title]="'Presupuesto vs ejecución por tipo de gasto'" [type]="chartType" [data]="chartData"></app-generic-chart>
+    </mat-card>
+  </div>
+  <div class="col-md-6">
+    <mat-card class="mx-4 p-4" *ngIf="executionShareChartData">
+      <app-generic-chart [title]="'Ejecución por tipo de gasto'" [type]="'pie'" [data]="executionShareChartData"></app-generic-chart>
+    </mat-card>
+  </div>
+  <div class="col-md-12 mt-3">
+    <mat-card class="mx-4 p-4" *ngIf="usageChartData">
+      <app-generic-chart
+        [title]="'% de presupuesto utilizado por tipo de gasto'"
+        [type]="'pie'"
+        [data]="usageChartData"
+      ></app-generic-chart>
+    </mat-card>
+  </div>
+</div>
+
+<mat-card class="mx-4 p-4" *ngIf="!chartData">
+  <p class="mb-0">No hay datos para mostrar.</p>
+</mat-card>
