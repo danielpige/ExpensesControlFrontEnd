@@ -5,6 +5,7 @@ import { MoneyFundService } from './money-fund.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { FormModalMoneyFundComponent } from './form-modal-money-fund/form-modal-money-fund.component';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-money-fund',
@@ -14,6 +15,11 @@ import { FormModalMoneyFundComponent } from './form-modal-money-fund/form-modal-
 export class MoneyFundComponent {
   displayedColumns = ['name', 'accountType', 'currentBalance', 'isActive', 'actions'];
   dataSource: MoneyFund[] = [];
+  pagination: PageEvent = {
+    pageIndex: 0,
+    pageSize: 10,
+    length: 0,
+  };
 
   constructor(
     private dialog: MatDialog,
@@ -44,9 +50,12 @@ export class MoneyFundComponent {
   loadMoneyFunds(): void {
     this.loaderSvc.show();
 
-    this.moneyFundSvc.getAll().subscribe({
+    this.moneyFundSvc.getAll(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
       next: (res) => {
-        this.dataSource = res.Data;
+        this.dataSource = res.Data.Items;
+        this.pagination.length = res.Data.TotalCount;
+        this.pagination.pageIndex = res.Data.PageNumber - 1;
+        this.pagination.pageSize = res.Data.PageSize;
         this.loaderSvc.hide();
       },
       error: (error) => {
@@ -69,5 +78,10 @@ export class MoneyFundComponent {
         this.loaderSvc.hide();
       },
     });
+  }
+
+  chagePagination(event: PageEvent): void {
+    this.pagination = event;
+    this.loadMoneyFunds();
   }
 }

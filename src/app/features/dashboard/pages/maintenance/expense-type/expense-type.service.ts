@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from '../../../../../core/services/http.service';
-import { ApiResponse } from '../../../../../core/models/apiResponse.model';
+import { ApiResponse, PagedResult } from '../../../../../core/models/apiResponse.model';
 import { ExpenseType } from '../../../../../core/models/expenseType.model';
 
 @Injectable({
@@ -15,8 +15,8 @@ export class ExpenseTypeService {
     return this.httpSvc.get<ApiResponse<ExpenseType[]>>(`${this.baseUrl}/active`);
   }
 
-  getAll() {
-    return this.httpSvc.get<ApiResponse<ExpenseType[]>>(this.baseUrl);
+  getAll(pageindex: number, pageSize: number) {
+    return this.httpSvc.get<ApiResponse<PagedResult<ExpenseType>>>(`${this.baseUrl}?pageNumber=${pageindex}&pageSize=${pageSize}`);
   }
 
   create(dto: ExpenseType) {

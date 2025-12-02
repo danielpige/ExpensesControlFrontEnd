@@ -5,6 +5,7 @@ import { FormModalComponent } from './form-modal/form-modal.component';
 import { ExpenseTypeService } from './expense-type.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-expense-type',
@@ -14,6 +15,11 @@ import { SnackBarService } from '../../../../../core/services/snack-bar.service'
 export class ExpenseTypeComponent implements OnInit {
   displayedColumns = ['code', 'name', 'isActive', 'actions'];
   dataSource: ExpenseType[] = [];
+  pagination: PageEvent = {
+    pageIndex: 0,
+    pageSize: 10,
+    length: 0,
+  };
 
   constructor(
     private dialog: MatDialog,
@@ -44,9 +50,12 @@ export class ExpenseTypeComponent implements OnInit {
   loadExpenseTypes(): void {
     this.loaderSvc.show();
 
-    this.expenseTypeSvc.getAll().subscribe({
+    this.expenseTypeSvc.getAll(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
       next: (res) => {
-        this.dataSource = res.Data;
+        this.dataSource = res.Data.Items;
+        this.pagination.length = res.Data.TotalCount;
+        this.pagination.pageIndex = res.Data.PageNumber - 1;
+        this.pagination.pageSize = res.Data.PageSize;
         this.loaderSvc.hide();
       },
       error: (error) => {
@@ -69,5 +78,10 @@ export class ExpenseTypeComponent implements OnInit {
         this.loaderSvc.hide();
       },
     });
+  }
+
+  chagePagination(event: PageEvent): void {
+    this.pagination = event;
+    this.loadExpenseTypes();
   }
 }

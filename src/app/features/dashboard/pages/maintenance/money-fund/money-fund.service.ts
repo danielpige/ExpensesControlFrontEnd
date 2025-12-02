@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from '../../../../../core/services/http.service';
-import { ApiResponse } from '../../../../../core/models/apiResponse.model';
+import { ApiResponse, PagedResult } from '../../../../../core/models/apiResponse.model';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 
 @Injectable({
@@ -15,8 +15,8 @@ export class MoneyFundService {
     return this.httpSvc.get<ApiResponse<MoneyFund[]>>(`${this.baseUrl}/active`);
   }
 
-  getAll() {
-    return this.httpSvc.get<ApiResponse<MoneyFund[]>>(this.baseUrl);
+  getAll(pageindex: number, pageSize: number) {
+    return this.httpSvc.get<ApiResponse<PagedResult<MoneyFund>>>(`${this.baseUrl}?pageNumber=${pageindex}&pageSize=${pageSize}`);
   }
 
   create(dto: MoneyFund) {

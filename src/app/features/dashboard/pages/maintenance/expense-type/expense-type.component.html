@@ -51,6 +51,15 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
+    <mat-paginator
+      (page)="chagePagination($event)"
+      [length]="pagination.length"
+      [pageSize]="pagination.pageSize"
+      [pageIndex]="pagination.pageIndex"
+      [pageSizeOptions]="[2, 10, 25, 100]"
+      aria-label="Select page"
+    >
+    </mat-paginator>
   </div>
 </mat-card>
 

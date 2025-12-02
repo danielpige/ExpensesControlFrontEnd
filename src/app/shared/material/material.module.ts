@@ -20,6 +20,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 const materialModules = [
   MatToolbarModule,
@@ -39,6 +40,7 @@ const materialModules = [
   MatTooltipModule,
   MatSelectModule,
   MatDatepickerModule,
+  MatPaginatorModule,
 ];
 
 @NgModule({
