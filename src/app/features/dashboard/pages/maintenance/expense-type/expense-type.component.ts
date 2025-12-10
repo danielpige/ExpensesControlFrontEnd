@@ -50,7 +50,7 @@ export class ExpenseTypeComponent implements OnInit {
   loadExpenseTypes(): void {
     this.loaderSvc.show();
 
-    this.expenseTypeSvc.getAll(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
+    this.expenseTypeSvc.getAllByCurrentUser(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
       next: (res) => {
         this.dataSource = res.Data.Items;
         this.pagination.length = res.Data.TotalCount;
@@ -74,7 +74,6 @@ export class ExpenseTypeComponent implements OnInit {
         this.loadExpenseTypes();
       },
       error: () => {
-        this.snackBarSvc.error('Ocurrió un error al tratar de eliminar el tipo de gasto.');
         this.loaderSvc.hide();
       },
     });

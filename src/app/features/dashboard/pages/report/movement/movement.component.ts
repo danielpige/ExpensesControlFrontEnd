@@ -49,7 +49,7 @@ export class MovementComponent {
   loadMoneyFunds(): void {
     this.laoderSvc.show();
 
-    this.moneyFundSvc.getActives().subscribe({
+    this.moneyFundSvc.getActivesByCurrentUser().subscribe({
       next: (res) => {
         this.moneyFunds = res.Data ?? [];
         this.laoderSvc.hide();

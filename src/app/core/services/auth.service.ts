@@ -12,7 +12,6 @@ export class AuthService {
 
   constructor(private encription: EncryptionService) {
     const stored = this.encription.getDecryptedItem(TokenKeys.AUTH_USER);
-    console.log(stored);
 
     if (stored) {
       this.userSubject.next(JSON.parse(stored));

@@ -5,6 +5,7 @@ export interface MoneyFund {
   InitialBalance?: string;
   CurrentBalance?: string;
   IsActive?: boolean;
+  UserId: number;
 }
 
 export enum AccountType {

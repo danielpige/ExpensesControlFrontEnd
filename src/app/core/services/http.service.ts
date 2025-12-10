@@ -1,9 +1,9 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { SnackBarService } from './snack-bar.service';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from '../models/apiResponse.model';
+import { ApiErrorResponse, ApiResponse } from '../models/apiResponse.model';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 
@@ -54,18 +54,22 @@ export class HttpService {
       .pipe(catchError((error) => this.handleError(error)));
   }
 
-  private handleError(error: any) {
-    console.error('[HTTP ERROR]:', error);
+  private handleError(error: HttpErrorResponse) {
+    if (!environment.production) {
+      console.error('[HTTP ERROR]:', error);
+    }
 
     if (error?.status === 401) {
       this.authSvc.logout();
       this.router.navigate(['/auth/login']);
     }
 
-    const message = error?.error?.message || 'Ha ocurrido un error inesperado.';
+    const backendError = error?.error as ApiErrorResponse | undefined;
 
-    this.snackBarSvc.error(message);
+    const message = backendError?.Message || (error?.error as any)?.message || 'Ha ocurrido un error inesperado.';
 
-    return throwError(() => error);
+    this.snackBarSvc.error(!environment.production ? message : 'Parece que algo ha salido mal, vuelve a intentarlo más tarde.');
+
+    return throwError(() => backendError ?? error);
   }
 }

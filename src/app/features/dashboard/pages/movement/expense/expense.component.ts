@@ -60,8 +60,8 @@ export class ExpenseComponent {
   loadSelects(): void {
     this.loaderSvc.show();
     forkJoin({
-      funds: this.moneyFundSvc.getActives(),
-      types: this.expenseTypeSvc.getActives(),
+      funds: this.moneyFundSvc.getActivesByCurrentUser(),
+      types: this.expenseTypeSvc.getActivesByCurrentUser(),
     }).subscribe(({ funds, types }) => {
       if (funds.Success) {
         this.moneyFunds = funds.Data ?? [];
@@ -112,9 +112,6 @@ export class ExpenseComponent {
         this.loaderSvc.hide();
 
         this.resetForm();
-      },
-      error: (error) => {
-        this.snackBarSvc.error(error.error.Message);
       },
     });
   }

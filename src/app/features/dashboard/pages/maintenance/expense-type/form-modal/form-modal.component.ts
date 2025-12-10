@@ -59,7 +59,6 @@ export class FormModalComponent implements OnInit {
         this.loaderSvc.hide();
       },
       error: () => {
-        this.snackBarSvc.success('Ocurrió un error al tratar de guardar datos.');
         this.loaderSvc.hide();
       },
     });

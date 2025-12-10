@@ -50,7 +50,7 @@ export class MoneyFundComponent {
   loadMoneyFunds(): void {
     this.loaderSvc.show();
 
-    this.moneyFundSvc.getAll(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
+    this.moneyFundSvc.getAllByCurrentUser(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
       next: (res) => {
         this.dataSource = res.Data.Items;
         this.pagination.length = res.Data.TotalCount;
@@ -74,7 +74,6 @@ export class MoneyFundComponent {
         this.loadMoneyFunds();
       },
       error: () => {
-        this.snackBarSvc.error('Ocurrió un error al tratar de eliminar el fondo.');
         this.loaderSvc.hide();
       },
     });

@@ -12,11 +12,21 @@ export class MoneyFundService {
   constructor(private httpSvc: HttpService) {}
 
   getActives() {
-    return this.httpSvc.get<ApiResponse<MoneyFund[]>>(`${this.baseUrl}/active`);
+    return this.httpSvc.get<ApiResponse<MoneyFund[]>>(`${this.baseUrl}/actives`);
+  }
+
+  getActivesByCurrentUser() {
+    return this.httpSvc.get<ApiResponse<MoneyFund[]>>(`${this.baseUrl}/get-all-by-current-user/actives`);
   }
 
   getAll(pageindex: number, pageSize: number) {
     return this.httpSvc.get<ApiResponse<PagedResult<MoneyFund>>>(`${this.baseUrl}?pageNumber=${pageindex}&pageSize=${pageSize}`);
+  }
+
+  getAllByCurrentUser(pageindex: number, pageSize: number) {
+    return this.httpSvc.get<ApiResponse<PagedResult<MoneyFund>>>(
+      `${this.baseUrl}/get-all-by-current-user?pageNumber=${pageindex}&pageSize=${pageSize}`
+    );
   }
 
   create(dto: MoneyFund) {

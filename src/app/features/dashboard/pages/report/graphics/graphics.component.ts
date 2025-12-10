@@ -53,6 +53,7 @@ export class GraphicsComponent implements OnInit {
     this.graphicSvc.getBudgetVsExecution(from, to).subscribe({
       next: (res) => {
         this.buildChartData(res.Data);
+        this.loaderSvc.hide();
       },
       error: () => {
         this.loaderSvc.hide();

@@ -3,4 +3,5 @@ export interface ExpenseType {
   Code?: string;
   Name: string;
   IsActive?: boolean;
+  UserId: number;
 }

@@ -15,19 +15,12 @@
   <form class="row py-4" (ngSubmit)="onSearch()">
     <div class="col-md-3">
       <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Año</mat-label>
-        <input matInput type="number" [(ngModel)]="selectedYear" name="year" />
-      </mat-form-field>
-    </div>
-
-    <div class="col-md-3">
-      <mat-form-field appearance="outline" class="w-100">
-        <mat-label>Mes</mat-label>
-        <mat-select [(ngModel)]="selectedMonth" name="month">
-          <mat-option *ngFor="let m of months" [value]="m.value">
-            {{ m.label }}
-          </mat-option>
-        </mat-select>
+        <mat-label>Mes y año</mat-label>
+        <input readonly matInput [matDatepicker]="dp" [formControl]="date" />
+        <mat-hint>MM/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)" panelClass="example-month-picker">
+        </mat-datepicker>
       </mat-form-field>
     </div>
 

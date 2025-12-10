@@ -5,6 +5,8 @@ import { LoaderService } from '../../../../../core/services/loader.service';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { FormModalBudgetComponent } from './form-modal-budget/form-modal-budget.component';
+import { FormControl } from '@angular/forms';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-budget',
@@ -13,9 +15,10 @@ import { FormModalBudgetComponent } from './form-modal-budget/form-modal-budget.
 })
 export class BudgetComponent implements OnInit {
   selectedYear = new Date().getFullYear();
-  selectedMonth = new Date().getMonth() + 1;
+  selectedMonth = new Date().getMonth();
   budgets: Budget[] = [];
   displayedColumns = ['expenseTypeName', 'amount', 'actions'];
+  date: FormControl<Date | null> = new FormControl(new Date());
 
   months = [
     { value: 1, label: 'Enero' },
@@ -48,7 +51,7 @@ export class BudgetComponent implements OnInit {
 
     this.loaderSvc.show();
 
-    this.budgetSvc.getByPeriod(this.selectedYear, this.selectedMonth).subscribe({
+    this.budgetSvc.getByPeriod(this.selectedYear, this.selectedMonth + 1).subscribe({
       next: (res) => {
         this.budgets = res.Data ?? [];
         this.loaderSvc.hide();
@@ -65,7 +68,7 @@ export class BudgetComponent implements OnInit {
       data: {
         data,
         year: this.selectedYear,
-        month: this.selectedMonth,
+        month: this.selectedMonth + 1,
       },
     });
 
@@ -88,9 +91,22 @@ export class BudgetComponent implements OnInit {
         this.onSearch();
       },
       error: () => {
-        this.snackBarSvc.error('Ocurrió un error al tratar de eliminar el presupuesto.');
         this.loaderSvc.hide();
       },
     });
+  }
+
+  setMonthAndYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>) {
+    const ctrlValue = this.date?.value ?? new Date();
+
+    ctrlValue.setMonth(normalizedMonthAndYear.getMonth());
+    ctrlValue.setFullYear(normalizedMonthAndYear.getFullYear());
+    ctrlValue.setDate(1);
+
+    this.selectedMonth = normalizedMonthAndYear.getMonth();
+    this.selectedYear = normalizedMonthAndYear.getFullYear();
+    this.date?.setValue(ctrlValue);
+
+    datepicker.close();
   }
 }

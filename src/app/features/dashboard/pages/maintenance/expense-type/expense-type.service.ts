@@ -12,11 +12,21 @@ export class ExpenseTypeService {
   constructor(private httpSvc: HttpService) {}
 
   getActives() {
-    return this.httpSvc.get<ApiResponse<ExpenseType[]>>(`${this.baseUrl}/active`);
+    return this.httpSvc.get<ApiResponse<ExpenseType[]>>(`${this.baseUrl}/actives`);
+  }
+
+  getActivesByCurrentUser() {
+    return this.httpSvc.get<ApiResponse<ExpenseType[]>>(`${this.baseUrl}/get-all-by-current-user/actives`);
   }
 
   getAll(pageindex: number, pageSize: number) {
     return this.httpSvc.get<ApiResponse<PagedResult<ExpenseType>>>(`${this.baseUrl}?pageNumber=${pageindex}&pageSize=${pageSize}`);
+  }
+
+  getAllByCurrentUser(pageindex: number, pageSize: number) {
+    return this.httpSvc.get<ApiResponse<PagedResult<ExpenseType>>>(
+      `${this.baseUrl}/get-all-by-current-user?pageNumber=${pageindex}&pageSize=${pageSize}`
+    );
   }
 
   create(dto: ExpenseType) {

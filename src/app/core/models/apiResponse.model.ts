@@ -19,3 +19,8 @@ export interface PagedResult<T> {
   HasPreviousPage: boolean;
   HasNextPage: boolean;
 }
+
+export interface ApiErrorResponse {
+  Success: boolean;
+  Message: string;
+}

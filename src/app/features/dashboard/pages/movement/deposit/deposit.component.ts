@@ -41,13 +41,12 @@ export class DepositComponent {
   loadMoneyFunds() {
     this.loaderSvc.show();
 
-    this.moneyFundSvc.getActives().subscribe({
+    this.moneyFundSvc.getActivesByCurrentUser().subscribe({
       next: (res) => {
         this.moneyFunds = res.Data ?? [];
         this.loaderSvc.hide();
       },
-      error: (error) => {
-        this.snackBarSvc.error(error.error.Message);
+      error: () => {
         this.loaderSvc.hide();
       },
     });
@@ -81,8 +80,7 @@ export class DepositComponent {
         });
         this.loaderSvc.hide();
       },
-      error: (error) => {
-        this.snackBarSvc.error(error.error.Message);
+      error: () => {
         this.loaderSvc.hide();
       },
     });
