@@ -1,68 +1,66 @@
-<div class="d-flex justify-content-between align-items-center mb-3 mt-3 mx-3">
+<div class="flex justify-between items-center my-3 mx-3">
   <h2>Tipos de gastos</h2>
   <button mat-raised-button color="primary" (click)="openFormModal()">Crear nuevo tipo de gasto</button>
 </div>
 
 <mat-divider></mat-divider>
 
-<div class="d-flex justify-content-end my-3 mx-3">
+<div class="flex justify-end my-3 mx-3">
   <button mat-fab color="primary" (click)="loadExpenseTypes()">
     <mat-icon>cached</mat-icon>
   </button>
 </div>
 
 <mat-card class="mx-4" *ngIf="dataSource.length !== 0">
-  <div class="table-responsive">
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z1 w-100">
-      <!-- Code Column -->
-      <ng-container matColumnDef="code">
-        <th mat-header-cell *matHeaderCellDef>Código</th>
-        <td mat-cell *matCellDef="let row">{{ row.Code }}</td>
-      </ng-container>
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1 w-full">
+    <!-- Code Column -->
+    <ng-container matColumnDef="code">
+      <th mat-header-cell *matHeaderCellDef>Código</th>
+      <td mat-cell *matCellDef="let row">{{ row.Code }}</td>
+    </ng-container>
 
-      <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Nombre</th>
-        <td mat-cell *matCellDef="let row">{{ row.Name }}</td>
-      </ng-container>
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let row">{{ row.Name }}</td>
+    </ng-container>
 
-      <!-- Active Column -->
-      <ng-container matColumnDef="isActive">
-        <th mat-header-cell *matHeaderCellDef>Estado</th>
-        <td mat-cell *matCellDef="let row">
-          <mat-icon color="primary" *ngIf="row.IsActive">check_circle</mat-icon>
-          <mat-icon color="warn" *ngIf="!row.IsActive">cancel</mat-icon>
-        </td>
-      </ng-container>
+    <!-- Active Column -->
+    <ng-container matColumnDef="isActive">
+      <th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let row">
+        <mat-icon color="primary" *ngIf="row.IsActive">check_circle</mat-icon>
+        <mat-icon color="warn" *ngIf="!row.IsActive">cancel</mat-icon>
+      </td>
+    </ng-container>
 
-      <!-- Actions Column -->
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Acciones</th>
-        <td mat-cell *matCellDef="let row">
-          <button mat-icon-button color="primary" (click)="openFormModal(row)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteExpense(row)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Acciones</th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button color="primary" (click)="openFormModal(row)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteExpense(row)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
-    <mat-paginator
-      (page)="chagePagination($event)"
-      [length]="pagination.length"
-      [pageSize]="pagination.pageSize"
-      [pageIndex]="pagination.pageIndex"
-      [pageSizeOptions]="[2, 10, 25, 100]"
-      aria-label="Select page"
-    >
-    </mat-paginator>
-  </div>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+  <mat-paginator
+    (page)="chagePagination($event)"
+    [length]="pagination.length"
+    [pageSize]="pagination.pageSize"
+    [pageIndex]="pagination.pageIndex"
+    [pageSizeOptions]="[2, 10, 25, 100]"
+    aria-label="Select page"
+  >
+  </mat-paginator>
 </mat-card>
 
-<mat-card class="mx-4" *ngIf="dataSource.length === 0">
+<mat-card class="mx-4 p-3" *ngIf="dataSource.length === 0">
   <p class="m-4">No hay datos para mostrar.</p>
 </mat-card>

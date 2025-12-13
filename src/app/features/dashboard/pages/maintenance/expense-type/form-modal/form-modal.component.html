@@ -3,16 +3,16 @@
 </h2>
 
 <mat-dialog-content class="py-2" [formGroup]="form">
-  <div class="row">
-    <div class="col-12 mb-3">
-      <mat-form-field appearance="outline" class="w-100">
+  <div class="grid grid-cols-1 py-2">
+    <div class="mb-3">
+      <mat-form-field appearance="outline" class="w-full">
         <mat-label>Nombre</mat-label>
         <input matInput formControlName="Name" />
         <mat-error> El nombre es requerido. </mat-error>
       </mat-form-field>
     </div>
 
-    <div class="col-12 mb-3" *ngIf="data">
+    <div class="mb-3" *ngIf="data">
       <mat-slide-toggle formControlName="IsActive"> Activo </mat-slide-toggle>
     </div>
   </div>

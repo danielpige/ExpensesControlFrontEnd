@@ -1,29 +1,29 @@
-<div class="container">
-  <div class="d-flex justify-content-center align-items-center vh-100 row">
-    <div class="p-4 border rounded bg-light col-md-4">
-      <div class="row" [formGroup]="registerForm">
-        <div class="col-md-12">
-          <h3 class="text-center">Registro de usuario</h3>
+<div class="mx-auto max-w-7xl px-4">
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md p-6 border rounded-lg bg-gray-50">
+      <div class="grid grid-cols-1" [formGroup]="registerForm">
+        <div>
+          <h3 class="text-center text-xl font-semibold">Registro de usuario</h3>
         </div>
 
-        <div class="col-md-12 mt-2">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="mt-2">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Usuario</mat-label>
             <input matInput formControlName="Username" placeholder="Usuario" type="text" autocomplete="off" />
             <mat-error>El usuario es requerido</mat-error>
           </mat-form-field>
         </div>
 
-        <div class="col-md-12 mt-3">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="mt-3">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Email</mat-label>
             <input matInput formControlName="Email" placeholder="Email" type="email" autocomplete="off" />
             <mat-error>El email es requerido, y debe contar con estructura de email.</mat-error>
           </mat-form-field>
         </div>
 
-        <div class="col-md-12 mt-2">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="mt-2">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Contraseña</mat-label>
             <input
               matInput
@@ -48,8 +48,8 @@
           </mat-form-field>
         </div>
 
-        <div class="col-md-12 mt-2">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="mt-2">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Confirmar contraseña</mat-label>
             <input
               matInput
@@ -71,12 +71,12 @@
           </mat-form-field>
         </div>
 
-        <div class="col-md-12 mt-1">
-          <p class="text-start">¿Ya estás registrado? <a mat-button routerLink="/auth/login">¡Inicia sesión!</a></p>
+        <div class="mt-1">
+          <p class="text-left">¿Ya estás registrado? <a mat-button routerLink="/auth/login">¡Inicia sesión!</a></p>
         </div>
 
-        <div class="col-md-6 mx-auto">
-          <button class="w-100" (click)="submitForm()" type="button" color="primary" mat-flat-button>Registrarse</button>
+        <div class="mx-auto w-full max-w-xs">
+          <button class="w-full" (click)="submitForm()" type="button" color="primary" mat-flat-button>Registrarse</button>
         </div>
       </div>
     </div>

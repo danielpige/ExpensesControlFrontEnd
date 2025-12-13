@@ -3,22 +3,23 @@
 <mat-dialog-content class="py-3 px-4">
   <p>Tu presupuesto se excedió en los siguientes tipos de gastos:</p>
 
-  <div class="table-responsive">
-    <table class="table table-sm table-striped">
-      <thead>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50">
         <tr>
-          <th>Tipo de gasto</th>
-          <th>Presupuesto</th>
-          <th>Ejecutado</th>
-          <th>Sobregirado</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-700">Tipo de gasto</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-700">Presupuesto</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-700">Ejecutado</th>
+          <th class="px-3 py-2 text-left font-semibold text-gray-700">Sobregirado</th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let o of data.overruns">
-          <td>{{ o.ExpenseTypeName }}</td>
-          <td>{{ o.BudgetAmount | number : '1.2-2' }}</td>
-          <td>{{ o.ExecutedAmount | number : '1.2-2' }}</td>
-          <td class="text-danger">
+
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let o of data.overruns" class="odd:bg-white even:bg-gray-50">
+          <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ o.ExpenseTypeName }}</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ o.BudgetAmount | number : '1.2-2' }}</td>
+          <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ o.ExecutedAmount | number : '1.2-2' }}</td>
+          <td class="px-3 py-2 whitespace-nowrap text-red-600">
             {{ o.OverrunAmount | number : '1.2-2' }}
           </td>
         </tr>

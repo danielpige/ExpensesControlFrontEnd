@@ -4,11 +4,11 @@
 
 <mat-divider></mat-divider>
 
-<form class="mt-4 mx-4" [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
+<form class="mt-4 mx-4 p-4" [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
   <mat-card class="mb-3 p-4">
-    <div class="row">
-      <div class="col-md-4 mb-3">
-        <mat-form-field appearance="outline" class="w-100">
+    <div class="grid grid-cols-2 gap-4">
+      <div class="">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Fecha</mat-label>
           <input matInput [matDatepicker]="picker" formControlName="Date" />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -16,8 +16,8 @@
         </mat-form-field>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <mat-form-field appearance="outline" class="w-100">
+      <div class="">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Fondo</mat-label>
           <mat-select formControlName="MoneyFundId">
             <mat-option *ngFor="let mf of moneyFunds" [value]="mf.Id">
@@ -27,18 +27,16 @@
           <mat-error> Fondo es requerido. </mat-error>
         </mat-form-field>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="col-md-4 mb-3">
-        <mat-form-field appearance="outline" class="w-100">
+      <div class="">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Nombre de comerciante</mat-label>
           <input matInput formControlName="MerchantName" />
         </mat-form-field>
       </div>
 
-      <div class="col-md-4 mb-3">
-        <mat-form-field appearance="outline" class="w-100">
+      <div class="">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Tipo de documento</mat-label>
           <mat-select formControlName="DocumentType">
             <mat-option *ngFor="let dt of documentTypes" [value]="dt.value">
@@ -47,11 +45,9 @@
           </mat-select>
         </mat-form-field>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <mat-form-field appearance="outline" class="w-100">
+      <div class="">
+        <mat-form-field appearance="outline" class="w-full">
           <mat-label>Comentarios</mat-label>
           <textarea matInput rows="2" formControlName="Comments"></textarea>
         </mat-form-field>
@@ -59,16 +55,16 @@
     </div>
   </mat-card>
 
-  <mat-card class="p-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+  <mat-card class="p-4 mt-4">
+    <div class="flex justify-between items-center mb-4">
       <h3>Detalles</h3>
-      <button mat-stroked-button color="primary" type="button" (click)="addDetailRow()">Agregar detalle</button>
+      <button mat-stroked-button color="accent" type="button" (click)="addDetailRow()">Agregar detalle</button>
     </div>
 
     <div formArrayName="Details">
-      <div *ngFor="let group of details.controls; let i = index" [formGroupName]="i" class="row mb-2">
-        <div class="col-md-4 mb-2">
-          <mat-form-field appearance="outline" class="w-100">
+      <div *ngFor="let group of details.controls; let i = index" [formGroupName]="i" class="flex flex-row gap-4">
+        <div class="basis-1/4 mb-2">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Tipo de gasto</mat-label>
             <mat-select formControlName="ExpenseTypeId">
               <mat-option *ngFor="let et of expenseTypes" [value]="et.Id">
@@ -79,8 +75,8 @@
           </mat-form-field>
         </div>
 
-        <div class="col-md-3 mb-2">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="basis-2/4 mb-2">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Monto</mat-label>
             <input matInput type="number" formControlName="Amount" />
             <mat-error> El monto es requerido </mat-error>
@@ -88,14 +84,14 @@
           </mat-form-field>
         </div>
 
-        <div class="col-md-4 mb-2">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="basis-3/4 mb-2">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Comentarios</mat-label>
             <input matInput formControlName="Comments" />
           </mat-form-field>
         </div>
 
-        <div class="col-md-1 mb-2">
+        <div class="basis-4/4 mb-2">
           <button mat-icon-button color="warn" type="button" (click)="removeDetailRow(i)" *ngIf="details.length > 1">
             <mat-icon>delete</mat-icon>
           </button>
@@ -106,7 +102,7 @@
     </div>
   </mat-card>
 
-  <div class="mt-3 d-flex justify-content-end">
+  <div class="mt-3 flex justify-end">
     <button mat-raised-button color="primary" type="submit">Guardar gasto</button>
   </div>
 </form>
