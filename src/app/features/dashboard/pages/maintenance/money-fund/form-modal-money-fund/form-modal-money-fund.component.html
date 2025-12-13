@@ -3,17 +3,17 @@
 </h2>
 
 <mat-dialog-content class="py-2" [formGroup]="form">
-  <div class="row">
-    <div class="col-12 mb-3">
-      <mat-form-field appearance="outline" class="w-100">
+  <div class="grid grid-cols-1 py-2">
+    <div class="mb-3">
+      <mat-form-field appearance="outline" class="w-full">
         <mat-label>Nombre</mat-label>
         <input matInput formControlName="Name" />
         <mat-error> El nombre es requerido. </mat-error>
       </mat-form-field>
     </div>
 
-    <div class="col-md-12 mb-3">
-      <mat-form-field appearance="outline" class="w-100">
+    <div class="mb-3">
+      <mat-form-field appearance="outline" class="w-full">
         <mat-label>Tipo de cuenta</mat-label>
         <mat-select formControlName="AccountType">
           @for (type of accountTypes; track type) {
@@ -23,8 +23,8 @@
       </mat-form-field>
     </div>
 
-    <div class="col-12 mb-3">
-      <mat-form-field appearance="outline" class="w-100">
+    <div class="mb-3">
+      <mat-form-field appearance="outline" class="w-full">
         <mat-label *ngIf="!data">Balance inicial</mat-label>
         <mat-label *ngIf="data">Saldo actual</mat-label>
         <input type="number" [readonly]="data ? true : false" matInput formControlName="InitialBalance" />
@@ -33,7 +33,7 @@
       </mat-form-field>
     </div>
 
-    <div class="col-12 mb-3" *ngIf="data">
+    <div class="mb-3" *ngIf="data">
       <mat-slide-toggle formControlName="IsActive"> Activo </mat-slide-toggle>
     </div>
   </div>
