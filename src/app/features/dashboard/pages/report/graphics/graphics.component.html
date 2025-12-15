@@ -39,19 +39,19 @@
 </form>
 
 @defer {
-<div class="grid grid-cols-2 gap-4">
+<div class="grid grid-cols-2 gap-4 mx-4">
   <div class="">
-    <mat-card class="mx-4 p-4" *ngIf="chartData">
+    <mat-card class="p-4" *ngIf="chartData">
       <app-generic-chart [title]="'Presupuesto vs ejecución por tipo de gasto'" [type]="chartType" [data]="chartData()"></app-generic-chart>
     </mat-card>
   </div>
   <div class="">
-    <mat-card class="mx-4 p-4" *ngIf="executionShareChartData">
+    <mat-card class="p-4" *ngIf="executionShareChartData">
       <app-generic-chart [title]="'Ejecución por tipo de gasto'" [type]="'pie'" [data]="executionShareChartData()"></app-generic-chart>
     </mat-card>
   </div>
   <div class="col-span-2">
-    <mat-card class="mx-4 p-4" *ngIf="usageChartData">
+    <mat-card class="p-4" *ngIf="usageChartData">
       <app-generic-chart
         [title]="'% de presupuesto utilizado por tipo de gasto'"
         [type]="'pie'"

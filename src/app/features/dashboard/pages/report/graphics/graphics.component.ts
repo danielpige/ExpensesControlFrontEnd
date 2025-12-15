@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { ChartData, ChartType } from '../../../../../shared/components/generic-chart/chart.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GraphicsService } from './graphics.service';
@@ -13,9 +13,57 @@ import { BudgetVsExecution } from '../../../../../core/models/graphic.model';
 export class GraphicsComponent implements OnInit {
   form!: FormGroup;
 
-  chartData = signal<ChartData | null>(null);
-  executionShareChartData = signal<ChartData | null>(null);
-  usageChartData = signal<ChartData | null>(null);
+  private budgetVsExecution = signal<BudgetVsExecution[] | null>(null);
+
+  chartData = computed<ChartData | null>(() => {
+    const data = this.budgetVsExecution();
+    if (!data?.length) return null;
+
+    const categories = data.map((x) => x.ExpenseTypeName);
+    const budgets = data.map((x) => x.TotalBudget);
+    const executed = data.map((x) => x.TotalExecuted);
+
+    return {
+      categories,
+      series: [
+        { name: 'Presupuesto', data: budgets },
+        { name: 'Ejecutado', data: executed },
+      ],
+    };
+  });
+
+  executionShareChartData = computed<ChartData | null>(() => {
+    const data = this.budgetVsExecution();
+    if (!data?.length) return null;
+
+    const categories = data.map((x) => x.ExpenseTypeName);
+    const executed = data.map((x) => x.TotalExecuted);
+
+    return {
+      categories,
+      series: [{ name: 'Ejecutado', data: executed }],
+    };
+  });
+
+  usageChartData = computed<ChartData | null>(() => {
+    const data = this.budgetVsExecution();
+    if (!data?.length) return null;
+
+    const categories: string[] = [];
+    const usagePercentages: number[] = [];
+
+    for (const item of data) {
+      if (item.TotalBudget <= 0) continue;
+      categories.push(item.ExpenseTypeName);
+      const usage = (item.TotalExecuted / item.TotalBudget) * 100;
+      usagePercentages.push(Number(usage.toFixed(2)));
+    }
+
+    return {
+      categories,
+      series: [{ name: '% de presupuesto usado', data: usagePercentages }],
+    };
+  });
 
   constructor(private fb: FormBuilder, private graphicSvc: GraphicsService, private loaderSvc: LoaderService) {}
 
@@ -53,60 +101,13 @@ export class GraphicsComponent implements OnInit {
 
     this.graphicSvc.getBudgetVsExecution(from, to).subscribe({
       next: (res) => {
-        this.buildChartData(res.Data);
+        this.budgetVsExecution.set(res.Data);
         this.loaderSvc.hide();
       },
       error: () => {
+        this.budgetVsExecution.set([]);
         this.loaderSvc.hide();
       },
-    });
-  }
-
-  buildChartData(data: BudgetVsExecution[]): void {
-    if (!data || data.length === 0) {
-      this.chartData.set(null);
-      this.executionShareChartData.set(null);
-      this.usageChartData.set(null);
-      return;
-    }
-
-    const categories = data.map((x) => x.ExpenseTypeName);
-    const budgets = data.map((x) => x.TotalBudget);
-    const executed = data.map((x) => x.TotalExecuted);
-
-    this.chartData.set({
-      categories,
-      series: [
-        { name: 'Presupuesto', data: budgets },
-        { name: 'Ejecutado', data: executed },
-      ],
-    });
-
-    this.executionShareChartData.set({
-      categories,
-      series: [{ name: 'Ejecutado', data: executed }],
-    });
-
-    this.buildUsageChartData(data);
-
-    this.loaderSvc.hide();
-  }
-
-  buildUsageChartData(data: BudgetVsExecution[]): void {
-    const categories: string[] = [];
-    const usagePercentages: number[] = [];
-
-    for (const item of data) {
-      if (item.TotalBudget <= 0) continue;
-
-      categories.push(item.ExpenseTypeName);
-      const usage = (item.TotalExecuted / item.TotalBudget) * 100;
-      usagePercentages.push(Number(usage.toFixed(2)));
-    }
-
-    this.usageChartData.set({
-      categories,
-      series: [{ name: '% de presupuesto usado', data: usagePercentages }],
     });
   }
 
