@@ -11,9 +11,6 @@ export class GraphicsService {
 
   private baseUrl = 'Reports';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   getBudgetVsExecution(from: string, to: string) {

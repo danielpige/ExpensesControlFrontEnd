@@ -11,9 +11,6 @@ export class ExpenseService {
 
   private baseUrl = 'Expenses';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   create(dto: Expense) {

@@ -18,9 +18,6 @@ export class HttpService {
 
   private readonly baseUrl = environment.apiUrl;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   get<T>(url: string, params?: any, headers?: any): Observable<T> {

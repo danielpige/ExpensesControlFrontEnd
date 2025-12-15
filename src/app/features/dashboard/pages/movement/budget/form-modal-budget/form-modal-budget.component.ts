@@ -26,9 +26,6 @@ export class FormModalBudgetComponent {
   form!: FormGroup;
   expenseTypes = signal<ExpenseType[]>([]);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

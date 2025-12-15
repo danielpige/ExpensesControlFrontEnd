@@ -21,9 +21,6 @@ export class FormModalComponent implements OnInit {
   readonly data = inject<ExpenseType>(MAT_DIALOG_DATA);
   form!: FormGroup;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

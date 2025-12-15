@@ -24,9 +24,6 @@ export class RegisterComponent implements OnInit {
   hidePassword = signal(true);
   hideConfirmPassword = signal(true);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

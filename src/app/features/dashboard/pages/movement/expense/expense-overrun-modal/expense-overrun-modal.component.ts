@@ -10,8 +10,5 @@ import { BudgetOverrun } from '../../../../../../core/models/expense.model';
 export class ExpenseOverrunModalComponent {
   data = inject(MAT_DIALOG_DATA);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 }

@@ -24,9 +24,6 @@ export class DepositComponent {
 
   moneyFunds = signal<MoneyFund[]>([]);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

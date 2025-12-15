@@ -39,9 +39,6 @@ export class ExpenseComponent {
     { value: DocumentType.Other, label: 'Otro' },
   ]);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

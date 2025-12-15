@@ -3,16 +3,12 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoaderService {
   private dialog = inject(MatDialog);
 
-
   private dialogRef?: MatDialogRef<LoaderComponent>;
-
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() {}
 

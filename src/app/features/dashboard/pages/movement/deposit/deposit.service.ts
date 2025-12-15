@@ -11,9 +11,6 @@ export class DepositService {
 
   private baseUrl = 'Deposits';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   create(dto: Deposit) {

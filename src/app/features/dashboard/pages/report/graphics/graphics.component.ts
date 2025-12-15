@@ -71,9 +71,6 @@ export class GraphicsComponent implements OnInit {
     };
   });
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

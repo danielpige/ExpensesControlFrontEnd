@@ -12,9 +12,6 @@ export class AuthService {
 
   private userSubject = new BehaviorSubject<User | null>(null);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {
     const stored = this.encription.getDecryptedItem(TokenKeys.AUTH_USER);
 

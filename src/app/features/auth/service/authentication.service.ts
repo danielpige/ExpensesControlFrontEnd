@@ -17,9 +17,6 @@ export class AuthenticationService {
     LOGIN: 'Auth/login',
   };
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   registerUser(userData: RegisterValues): Observable<ApiResponse<UserResponse>> {

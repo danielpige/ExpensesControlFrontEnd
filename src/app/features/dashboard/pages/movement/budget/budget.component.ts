@@ -42,9 +42,6 @@ export class BudgetComponent implements OnInit {
     { value: 12, label: 'Diciembre' },
   ];
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

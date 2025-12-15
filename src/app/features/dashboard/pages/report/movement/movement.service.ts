@@ -11,9 +11,6 @@ export class MovementService {
 
   private baseUrl = 'Movements';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   getByDateRange(from: string, to: string, moneyFundId?: number) {

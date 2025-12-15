@@ -11,9 +11,6 @@ export class MoneyFundService {
 
   private baseUrl = 'MoneyFunds';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   getActives() {

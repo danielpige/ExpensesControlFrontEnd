@@ -21,9 +21,6 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup<LoginForm>;
   hidePassword = signal(true);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

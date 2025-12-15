@@ -11,9 +11,6 @@ export class ExpenseTypeService {
 
   private baseUrl = 'ExpenseTypes';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   getActives() {

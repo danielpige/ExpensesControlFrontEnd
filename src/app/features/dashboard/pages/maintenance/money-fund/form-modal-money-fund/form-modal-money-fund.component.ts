@@ -23,9 +23,6 @@ export class FormModalMoneyFundComponent {
   accountTypeEs = AccountTypeEs;
   form!: FormGroup;
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   ngOnInit(): void {

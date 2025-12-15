@@ -11,9 +11,6 @@ export class AuthGuard implements CanActivate {
   private authSvc = inject(AuthService);
   private snackBar = inject(SnackBarService);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {

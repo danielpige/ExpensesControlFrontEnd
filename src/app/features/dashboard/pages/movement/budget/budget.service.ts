@@ -11,9 +11,6 @@ export class BudgetService {
 
   private baseUrl = 'Budgets';
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   getByPeriod(year: number, month: number) {

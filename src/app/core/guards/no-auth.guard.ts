@@ -9,9 +9,6 @@ export class NoAuthGuard implements CanActivate {
   private authSvc = inject(AuthService);
   private router = inject(Router);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
   constructor() {}
 
   canActivate(): boolean | UrlTree {
