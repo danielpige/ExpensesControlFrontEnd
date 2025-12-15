@@ -15,7 +15,8 @@
       </thead>
 
       <tbody class="divide-y divide-gray-200">
-        <tr *ngFor="let o of data.overruns" class="odd:bg-white even:bg-gray-50">
+        @for (o of data.overruns; track $index) {
+        <tr class="odd:bg-white even:bg-gray-50">
           <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ o.ExpenseTypeName }}</td>
           <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ o.BudgetAmount | number : '1.2-2' }}</td>
           <td class="px-3 py-2 whitespace-nowrap text-gray-900">{{ o.ExecutedAmount | number : '1.2-2' }}</td>
@@ -23,6 +24,7 @@
             {{ o.OverrunAmount | number : '1.2-2' }}
           </td>
         </tr>
+        }
       </tbody>
     </table>
   </div>

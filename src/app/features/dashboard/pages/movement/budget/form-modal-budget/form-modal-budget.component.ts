@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Budget } from '../../../../../../core/models/budget.model';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -18,7 +18,7 @@ export class FormModalBudgetComponent {
   readonly dialogRef = inject(MatDialogRef<FormModalBudgetComponent>);
   readonly data = inject<{ data: Budget; month: number; year: number }>(MAT_DIALOG_DATA);
   form!: FormGroup;
-  expenseTypes: ExpenseType[] = [];
+  expenseTypes = signal<ExpenseType[]>([]);
 
   constructor(
     private fb: FormBuilder,
@@ -45,10 +45,10 @@ export class FormModalBudgetComponent {
   getExpeseTypes(): void {
     this.expenseTypeSvc.getActivesByCurrentUser().subscribe({
       next: (res) => {
-        this.expenseTypes = res.Data ?? [];
+        this.expenseTypes.set(res.Data ?? []);
       },
       error: () => {
-        this.expenseTypes = [];
+        this.expenseTypes.set([]);
       },
     });
   }

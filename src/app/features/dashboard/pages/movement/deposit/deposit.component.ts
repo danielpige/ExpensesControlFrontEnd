@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { DepositService } from './deposit.service';
@@ -14,7 +14,7 @@ import { LoaderService } from '../../../../../core/services/loader.service';
 export class DepositComponent {
   form!: FormGroup;
 
-  moneyFunds: MoneyFund[] = [];
+  moneyFunds = signal<MoneyFund[]>([]);
 
   constructor(
     private fb: FormBuilder,
@@ -43,10 +43,11 @@ export class DepositComponent {
 
     this.moneyFundSvc.getActivesByCurrentUser().subscribe({
       next: (res) => {
-        this.moneyFunds = res.Data ?? [];
+        this.moneyFunds.set(res.Data ?? []);
         this.loaderSvc.hide();
       },
       error: () => {
+        this.moneyFunds.set([]);
         this.loaderSvc.hide();
       },
     });

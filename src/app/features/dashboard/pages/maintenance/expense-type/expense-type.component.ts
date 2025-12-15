@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ExpenseType } from '../../../../../core/models/expenseType.model';
 import { MatDialog } from '@angular/material/dialog';
 import { FormModalComponent } from './form-modal/form-modal.component';
@@ -14,7 +14,7 @@ import { PageEvent } from '@angular/material/paginator';
 })
 export class ExpenseTypeComponent implements OnInit {
   displayedColumns = ['code', 'name', 'isActive', 'actions'];
-  dataSource: ExpenseType[] = [];
+  dataSource = signal<ExpenseType[]>([]);
   pagination: PageEvent = {
     pageIndex: 0,
     pageSize: 10,
@@ -52,13 +52,14 @@ export class ExpenseTypeComponent implements OnInit {
 
     this.expenseTypeSvc.getAllByCurrentUser(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
       next: (res) => {
-        this.dataSource = res.Data.Items;
+        this.dataSource.set(res.Data.Items);
         this.pagination.length = res.Data.TotalCount;
         this.pagination.pageIndex = res.Data.PageNumber - 1;
         this.pagination.pageSize = res.Data.PageSize;
         this.loaderSvc.hide();
       },
-      error: (error) => {
+      error: () => {
+        this.dataSource.set([]);
         this.loaderSvc.hide();
       },
     });

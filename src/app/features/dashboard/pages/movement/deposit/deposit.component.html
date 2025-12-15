@@ -7,7 +7,7 @@
 <form class="mt-4 mx-4" [formGroup]="form" (ngSubmit)="onSubmit()">
   <mat-card class="mb-3 p-4">
     <div class="grid grid-cols-3 gap-4">
-      <div class="">
+      <div>
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Fecha</mat-label>
           <input matInput [matDatepicker]="picker" formControlName="Date" />
@@ -17,19 +17,19 @@
         </mat-form-field>
       </div>
 
-      <div class="">
+      <div>
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Fondo</mat-label>
           <mat-select formControlName="MoneyFundId">
-            <mat-option *ngFor="let mf of moneyFunds" [value]="mf.Id">
-              {{ mf.Name }} ({{ mf.AccountType | accountTypeTranslate }})
-            </mat-option>
+            @for (mf of moneyFunds(); track mf.Id) {
+            <mat-option [value]="mf.Id"> {{ mf.Name }} ({{ mf.AccountType | accountTypeTranslate }}) </mat-option>
+            }
           </mat-select>
           <mat-error> El fondo es requerido </mat-error>
         </mat-form-field>
       </div>
 
-      <div class="">
+      <div>
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Monto</mat-label>
           <input matInput type="number" formControlName="Amount" />
@@ -38,7 +38,7 @@
         </mat-form-field>
       </div>
 
-      <div class="">
+      <div>
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Comentarios</mat-label>
           <textarea matInput rows="2" formControlName="Comments"></textarea>
