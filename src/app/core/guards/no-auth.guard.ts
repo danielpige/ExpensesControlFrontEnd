@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, CanActivateFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
@@ -6,7 +6,10 @@ import { AuthService } from '../services/auth.service';
   providedIn: 'root',
 })
 export class NoAuthGuard implements CanActivate {
-  constructor(private authSvc: AuthService, private router: Router) {}
+  private authSvc = inject(AuthService);
+  private router = inject(Router);
+
+  constructor() {}
 
   canActivate(): boolean | UrlTree {
     const isLoggedIn = this.authSvc.isAuthenticated();

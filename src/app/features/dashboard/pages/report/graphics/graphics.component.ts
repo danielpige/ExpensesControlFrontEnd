@@ -1,9 +1,10 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ChartData, ChartType } from '../../../../../shared/components/generic-chart/chart.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GraphicsService } from './graphics.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { BudgetVsExecution } from '../../../../../core/models/graphic.model';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-graphics',
@@ -11,6 +12,11 @@ import { BudgetVsExecution } from '../../../../../core/models/graphic.model';
   styleUrl: './graphics.component.scss',
 })
 export class GraphicsComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private graphicSvc = inject(GraphicsService);
+  private loaderSvc = inject(LoaderService);
+
+  private title = inject(Title);
   form!: FormGroup;
 
   private budgetVsExecution = signal<BudgetVsExecution[] | null>(null);
@@ -65,9 +71,10 @@ export class GraphicsComponent implements OnInit {
     };
   });
 
-  constructor(private fb: FormBuilder, private graphicSvc: GraphicsService, private loaderSvc: LoaderService) {}
+  constructor() {}
 
   ngOnInit(): void {
+    this.title.setTitle('Gráficos de presupuestos y gastos');
     this.initForm();
     this.onSearch();
   }

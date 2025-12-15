@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpService } from '../../../../../core/services/http.service';
 import { ApiResponse } from '../../../../../core/models/apiResponse.model';
 import { Movement } from '../../../../../core/models/movement.model';
@@ -7,9 +7,11 @@ import { Movement } from '../../../../../core/models/movement.model';
   providedIn: 'root',
 })
 export class MovementService {
+  private httpSvc = inject(HttpService);
+
   private baseUrl = 'Movements';
 
-  constructor(private httpSvc: HttpService) {}
+  constructor() {}
 
   getByDateRange(from: string, to: string, moneyFundId?: number) {
     let url = `${this.baseUrl}?from=${from}&to=${to}`;

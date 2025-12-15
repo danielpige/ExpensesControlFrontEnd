@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MoneyFundService } from './money-fund.service';
@@ -6,6 +6,7 @@ import { LoaderService } from '../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { FormModalMoneyFundComponent } from './form-modal-money-fund/form-modal-money-fund.component';
 import { PageEvent } from '@angular/material/paginator';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-money-fund',
@@ -13,6 +14,12 @@ import { PageEvent } from '@angular/material/paginator';
   styleUrl: './money-fund.component.scss',
 })
 export class MoneyFundComponent {
+  private dialog = inject(MatDialog);
+  private moneyFundSvc = inject(MoneyFundService);
+  private loaderSvc = inject(LoaderService);
+  private snackBarSvc = inject(SnackBarService);
+
+  private title = inject(Title);
   displayedColumns = ['name', 'accountType', 'currentBalance', 'isActive', 'actions'];
   dataSource = signal<MoneyFund[]>([]);
   pagination: PageEvent = {
@@ -21,14 +28,10 @@ export class MoneyFundComponent {
     length: 0,
   };
 
-  constructor(
-    private dialog: MatDialog,
-    private moneyFundSvc: MoneyFundService,
-    private loaderSvc: LoaderService,
-    private snackBarSvc: SnackBarService
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
+    this.title.setTitle('Fondos monetarios');
     this.loadMoneyFunds();
   }
 

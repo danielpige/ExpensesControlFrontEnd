@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpService } from '../../../../../core/services/http.service';
 import { ApiResponse } from '../../../../../core/models/apiResponse.model';
 import { Budget } from '../../../../../core/models/budget.model';
@@ -7,9 +7,11 @@ import { Budget } from '../../../../../core/models/budget.model';
   providedIn: 'root',
 })
 export class BudgetService {
+  private httpSvc = inject(HttpService);
+
   private baseUrl = 'Budgets';
 
-  constructor(private httpSvc: HttpService) {}
+  constructor() {}
 
   getByPeriod(year: number, month: number) {
     return this.httpSvc.get<ApiResponse<Budget[]>>(`${this.baseUrl}?year=${year}&month=${month}`);

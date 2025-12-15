@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Budget } from '../../../../../core/models/budget.model';
 import { BudgetService } from './budget.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
@@ -7,6 +7,7 @@ import { SnackBarService } from '../../../../../core/services/snack-bar.service'
 import { FormModalBudgetComponent } from './form-modal-budget/form-modal-budget.component';
 import { FormControl } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-budget',
@@ -14,6 +15,12 @@ import { MatDatepicker } from '@angular/material/datepicker';
   styleUrl: './budget.component.scss',
 })
 export class BudgetComponent implements OnInit {
+  private budgetSvc = inject(BudgetService);
+  private loaderSvc = inject(LoaderService);
+  private dialog = inject(MatDialog);
+  private snackBarSvc = inject(SnackBarService);
+
+  private title = inject(Title);
   selectedYear = new Date().getFullYear();
   selectedMonth = new Date().getMonth();
   budgets = signal<Budget[]>([]);
@@ -35,14 +42,10 @@ export class BudgetComponent implements OnInit {
     { value: 12, label: 'Diciembre' },
   ];
 
-  constructor(
-    private budgetSvc: BudgetService,
-    private loaderSvc: LoaderService,
-    private dialog: MatDialog,
-    private snackBarSvc: SnackBarService
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
+    this.title.setTitle('Presupuestos');
     this.onSearch();
   }
 

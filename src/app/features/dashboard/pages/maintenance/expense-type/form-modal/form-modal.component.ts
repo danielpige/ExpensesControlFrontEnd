@@ -12,16 +12,16 @@ import { SnackBarService } from '../../../../../../core/services/snack-bar.servi
   styleUrl: './form-modal.component.scss',
 })
 export class FormModalComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private loaderSvc = inject(LoaderService);
+  private expenseTypeSvc = inject(ExpenseTypeService);
+  private snackBarSvc = inject(SnackBarService);
+
   readonly dialogRef = inject(MatDialogRef<FormModalComponent>);
   readonly data = inject<ExpenseType>(MAT_DIALOG_DATA);
   form!: FormGroup;
 
-  constructor(
-    private fb: FormBuilder,
-    private loaderSvc: LoaderService,
-    private expenseTypeSvc: ExpenseTypeService,
-    private snackBarSvc: SnackBarService
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.initForm();

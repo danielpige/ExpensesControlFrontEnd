@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User, UserResponse } from '../models/user.model';
 import { EncryptionService } from './encription.service';
@@ -8,9 +8,11 @@ import { TokenKeys } from '../enums/tokenKey.enum';
   providedIn: 'root',
 })
 export class AuthService {
+  private encription = inject(EncryptionService);
+
   private userSubject = new BehaviorSubject<User | null>(null);
 
-  constructor(private encription: EncryptionService) {
+  constructor() {
     const stored = this.encription.getDecryptedItem(TokenKeys.AUTH_USER);
 
     if (stored) {

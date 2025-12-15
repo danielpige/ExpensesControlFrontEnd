@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpService } from '../../../../../core/services/http.service';
 import { ApiResponse, PagedResult } from '../../../../../core/models/apiResponse.model';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
@@ -7,9 +7,11 @@ import { MoneyFund } from '../../../../../core/models/moneyFund.model';
   providedIn: 'root',
 })
 export class MoneyFundService {
+  private httpSvc = inject(HttpService);
+
   private baseUrl = 'MoneyFunds';
 
-  constructor(private httpSvc: HttpService) {}
+  constructor() {}
 
   getActives() {
     return this.httpSvc.get<ApiResponse<MoneyFund[]>>(`${this.baseUrl}/actives`);

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginForm, LoginValues } from '../../../../core/models/user.model';
 import { LoaderService } from '../../../../core/services/loader.service';
@@ -12,16 +12,16 @@ import { SnackBarService } from '../../../../core/services/snack-bar.service';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private loaderSvc = inject(LoaderService);
+  private authenticationSvc = inject(AuthenticationService);
+  private router = inject(Router);
+  private snackBar = inject(SnackBarService);
+
   loginForm!: FormGroup<LoginForm>;
   hidePassword = signal(true);
 
-  constructor(
-    private fb: FormBuilder,
-    private loaderSvc: LoaderService,
-    private authenticationSvc: AuthenticationService,
-    private router: Router,
-    private snackBar: SnackBarService
-  ) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.initForm();
