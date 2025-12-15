@@ -12,18 +12,21 @@ import { MoneyFundService } from '../money-fund.service';
   styleUrl: './form-modal-money-fund.component.scss',
 })
 export class FormModalMoneyFundComponent {
+  private fb = inject(FormBuilder);
+  private loaderSvc = inject(LoaderService);
+  private moneyFundSvc = inject(MoneyFundService);
+  private snackBarSvc = inject(SnackBarService);
+
   readonly dialogRef = inject(MatDialogRef<FormModalMoneyFundComponent>);
   readonly data = inject<MoneyFund>(MAT_DIALOG_DATA);
   accountTypes = Object.values(AccountType);
   accountTypeEs = AccountTypeEs;
   form!: FormGroup;
 
-  constructor(
-    private fb: FormBuilder,
-    private loaderSvc: LoaderService,
-    private moneyFundSvc: MoneyFundService,
-    private snackBarSvc: SnackBarService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.initForm();

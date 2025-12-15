@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { BudgetOverrun } from '../../../../../../core/models/expense.model';
 
@@ -8,5 +8,10 @@ import { BudgetOverrun } from '../../../../../../core/models/expense.model';
   styleUrl: './expense-overrun-modal.component.scss',
 })
 export class ExpenseOverrunModalComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { overruns: BudgetOverrun[] }) {}
+  data = inject(MAT_DIALOG_DATA);
+
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 }

@@ -1,10 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { DepositService } from './deposit.service';
 import { MoneyFundService } from '../../maintenance/money-fund/money-fund.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-deposit',
@@ -12,19 +13,24 @@ import { LoaderService } from '../../../../../core/services/loader.service';
   styleUrl: './deposit.component.scss',
 })
 export class DepositComponent {
+  private fb = inject(FormBuilder);
+  private depositSvc = inject(DepositService);
+  private moneyFundSvc = inject(MoneyFundService);
+  private snackBarSvc = inject(SnackBarService);
+  private loaderSvc = inject(LoaderService);
+
+  private title = inject(Title);
   form!: FormGroup;
 
   moneyFunds = signal<MoneyFund[]>([]);
 
-  constructor(
-    private fb: FormBuilder,
-    private depositSvc: DepositService,
-    private moneyFundSvc: MoneyFundService,
-    private snackBarSvc: SnackBarService,
-    private loaderSvc: LoaderService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
+    this.title.setTitle('Depósitos');
     this.initForm();
     this.loadMoneyFunds();
   }

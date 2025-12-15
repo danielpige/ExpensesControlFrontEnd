@@ -15,18 +15,21 @@ import { MatDatepicker } from '@angular/material/datepicker';
   styleUrl: './form-modal-budget.component.scss',
 })
 export class FormModalBudgetComponent {
+  private fb = inject(FormBuilder);
+  private loaderSvc = inject(LoaderService);
+  private budgetSvc = inject(BudgetService);
+  private expenseTypeSvc = inject(ExpenseTypeService);
+  private snackBarSvc = inject(SnackBarService);
+
   readonly dialogRef = inject(MatDialogRef<FormModalBudgetComponent>);
   readonly data = inject<{ data: Budget; month: number; year: number }>(MAT_DIALOG_DATA);
   form!: FormGroup;
   expenseTypes = signal<ExpenseType[]>([]);
 
-  constructor(
-    private fb: FormBuilder,
-    private loaderSvc: LoaderService,
-    private budgetSvc: BudgetService,
-    private expenseTypeSvc: ExpenseTypeService,
-    private snackBarSvc: SnackBarService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.initForm();

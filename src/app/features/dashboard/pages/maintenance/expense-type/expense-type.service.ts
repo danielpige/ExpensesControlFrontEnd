@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpService } from '../../../../../core/services/http.service';
 import { ApiResponse, PagedResult } from '../../../../../core/models/apiResponse.model';
 import { ExpenseType } from '../../../../../core/models/expenseType.model';
@@ -7,9 +7,14 @@ import { ExpenseType } from '../../../../../core/models/expenseType.model';
   providedIn: 'root',
 })
 export class ExpenseTypeService {
+  private httpSvc = inject(HttpService);
+
   private baseUrl = 'ExpenseTypes';
 
-  constructor(private httpSvc: HttpService) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   getActives() {
     return this.httpSvc.get<ApiResponse<ExpenseType[]>>(`${this.baseUrl}/actives`);

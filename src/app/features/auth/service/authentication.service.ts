@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpService } from '../../../core/services/http.service';
 import { LoginValues, RegisterValues, User, UserResponse } from '../../../core/models/user.model';
 import { Observable, tap } from 'rxjs';
@@ -9,12 +9,18 @@ import { AuthService } from '../../../core/services/auth.service';
   providedIn: 'root',
 })
 export class AuthenticationService {
+  private httpSvc = inject(HttpService);
+  private authSvc = inject(AuthService);
+
   private readonly ENDPOINTS = {
     REGISTER: 'Auth/register',
     LOGIN: 'Auth/login',
   };
 
-  constructor(private httpSvc: HttpService, private authSvc: AuthService) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   registerUser(userData: RegisterValues): Observable<ApiResponse<UserResponse>> {
     return this.httpSvc.post<ApiResponse<UserResponse>>(this.ENDPOINTS.REGISTER, userData).pipe(

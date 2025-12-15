@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { SnackBarService } from './snack-bar.service';
 import { environment } from '../../../environments/environment';
@@ -11,14 +11,17 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class HttpService {
+  private http = inject(HttpClient);
+  private readonly snackBarSvc = inject(SnackBarService);
+  private authSvc = inject(AuthService);
+  private router = inject(Router);
+
   private readonly baseUrl = environment.apiUrl;
 
-  constructor(
-    private http: HttpClient,
-    private readonly snackBarSvc: SnackBarService,
-    private authSvc: AuthService,
-    private router: Router
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   get<T>(url: string, params?: any, headers?: any): Observable<T> {
     return this.http

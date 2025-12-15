@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MovementService } from './movement.service';
 import { MoneyFundService } from '../../maintenance/money-fund/money-fund.service';
@@ -6,6 +6,7 @@ import { SnackBarService } from '../../../../../core/services/snack-bar.service'
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { Movement, MovementType } from '../../../../../core/models/movement.model';
 import { LoaderService } from '../../../../../core/services/loader.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-movement',
@@ -13,6 +14,12 @@ import { LoaderService } from '../../../../../core/services/loader.service';
   styleUrl: './movement.component.scss',
 })
 export class MovementComponent {
+  private fb = inject(FormBuilder);
+  private movementSvc = inject(MovementService);
+  private moneyFundSvc = inject(MoneyFundService);
+  private laoderSvc = inject(LoaderService);
+
+  private title = inject(Title);
   form!: FormGroup;
 
   moneyFunds = signal<MoneyFund[]>([]);
@@ -25,14 +32,13 @@ export class MovementComponent {
   totalExpenses = signal<number>(0);
   netBalance = signal<number>(0);
 
-  constructor(
-    private fb: FormBuilder,
-    private movementSvc: MovementService,
-    private moneyFundSvc: MoneyFundService,
-    private laoderSvc: LoaderService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
+    this.title.setTitle('Consulta de movimientos');
     this.initForm();
     this.loadMoneyFunds();
   }

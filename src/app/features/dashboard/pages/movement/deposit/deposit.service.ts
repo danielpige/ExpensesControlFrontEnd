@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpService } from '../../../../../core/services/http.service';
 import { Deposit } from '../../../../../core/models/deposit.model';
 import { ApiResponse } from '../../../../../core/models/apiResponse.model';
@@ -7,9 +7,14 @@ import { ApiResponse } from '../../../../../core/models/apiResponse.model';
   providedIn: 'root',
 })
 export class DepositService {
+  private httpSvc = inject(HttpService);
+
   private baseUrl = 'Deposits';
 
-  constructor(private httpSvc: HttpService) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   create(dto: Deposit) {
     return this.httpSvc.post<ApiResponse<Deposit>>(this.baseUrl, dto);

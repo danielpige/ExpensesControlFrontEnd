@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ExpenseType } from '../../../../../core/models/expenseType.model';
 import { MatDialog } from '@angular/material/dialog';
 import { FormModalComponent } from './form-modal/form-modal.component';
@@ -6,6 +6,7 @@ import { ExpenseTypeService } from './expense-type.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { PageEvent } from '@angular/material/paginator';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-expense-type',
@@ -13,6 +14,13 @@ import { PageEvent } from '@angular/material/paginator';
   styleUrl: './expense-type.component.scss',
 })
 export class ExpenseTypeComponent implements OnInit {
+  private dialog = inject(MatDialog);
+  private expenseTypeSvc = inject(ExpenseTypeService);
+  private loaderSvc = inject(LoaderService);
+  private snackBarSvc = inject(SnackBarService);
+
+  private title = inject(Title);
+
   displayedColumns = ['code', 'name', 'isActive', 'actions'];
   dataSource = signal<ExpenseType[]>([]);
   pagination: PageEvent = {
@@ -21,14 +29,13 @@ export class ExpenseTypeComponent implements OnInit {
     length: 0,
   };
 
-  constructor(
-    private dialog: MatDialog,
-    private expenseTypeSvc: ExpenseTypeService,
-    private loaderSvc: LoaderService,
-    private snackBarSvc: SnackBarService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
+    this.title.setTitle('Tipos de gastos');
     this.loadExpenseTypes();
   }
 

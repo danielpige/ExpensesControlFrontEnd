@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RegisterForm, RegisterValues } from '../../../../core/models/user.model';
 import { LoaderService } from '../../../../core/services/loader.service';
@@ -13,18 +13,21 @@ import { passwordMatchValidator } from '../../../../core/utils/validators/passwo
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private loaderSvc = inject(LoaderService);
+  private authenticationSvc = inject(AuthenticationService);
+  private router = inject(Router);
+  private snackBar = inject(SnackBarService);
+
   registerForm!: FormGroup<RegisterForm>;
 
   hidePassword = signal(true);
   hideConfirmPassword = signal(true);
 
-  constructor(
-    private fb: FormBuilder,
-    private loaderSvc: LoaderService,
-    private authenticationSvc: AuthenticationService,
-    private router: Router,
-    private snackBar: SnackBarService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.initForm();

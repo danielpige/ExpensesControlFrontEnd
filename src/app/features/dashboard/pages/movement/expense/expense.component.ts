@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MoneyFundService } from '../../maintenance/money-fund/money-fund.service';
 import { ExpenseTypeService } from '../../maintenance/expense-type/expense-type.service';
@@ -11,6 +11,7 @@ import { forkJoin } from 'rxjs';
 import { ExpenseOverrunModalComponent } from './expense-overrun-modal/expense-overrun-modal.component';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-expense',
@@ -18,6 +19,15 @@ import { SnackBarService } from '../../../../../core/services/snack-bar.service'
   styleUrl: './expense.component.scss',
 })
 export class ExpenseComponent {
+  private fb = inject(FormBuilder);
+  private moneyFundSvc = inject(MoneyFundService);
+  private expenseTypeSvc = inject(ExpenseTypeService);
+  private expenseSvc = inject(ExpenseService);
+  private snackBarSvc = inject(SnackBarService);
+  private dialog = inject(MatDialog);
+  private loaderSvc = inject(LoaderService);
+
+  private title = inject(Title);
   form!: FormGroup;
 
   moneyFunds = signal<MoneyFund[]>([]);
@@ -29,17 +39,13 @@ export class ExpenseComponent {
     { value: DocumentType.Other, label: 'Otro' },
   ]);
 
-  constructor(
-    private fb: FormBuilder,
-    private moneyFundSvc: MoneyFundService,
-    private expenseTypeSvc: ExpenseTypeService,
-    private expenseSvc: ExpenseService,
-    private snackBarSvc: SnackBarService,
-    private dialog: MatDialog,
-    private loaderSvc: LoaderService
-  ) {}
+  /** Inserted by Angular inject() migration for backwards compatibility */
+  constructor(...args: unknown[]);
+
+  constructor() {}
 
   ngOnInit(): void {
+    this.title.setTitle('Gastos');
     this.initForm();
     this.loadSelects();
   }
