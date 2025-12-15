@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MoneyFundService } from '../../maintenance/money-fund/money-fund.service';
 import { ExpenseTypeService } from '../../maintenance/expense-type/expense-type.service';
@@ -20,14 +20,14 @@ import { SnackBarService } from '../../../../../core/services/snack-bar.service'
 export class ExpenseComponent {
   form!: FormGroup;
 
-  moneyFunds: MoneyFund[] = [];
-  expenseTypes: ExpenseType[] = [];
+  moneyFunds = signal<MoneyFund[]>([]);
+  expenseTypes = signal<ExpenseType[]>([]);
 
-  documentTypes = [
+  documentTypes = signal([
     { value: DocumentType.Receipt, label: 'Recibo' },
     { value: DocumentType.Invoice, label: 'Factura' },
     { value: DocumentType.Other, label: 'Otro' },
-  ];
+  ]);
 
   constructor(
     private fb: FormBuilder,
@@ -64,10 +64,10 @@ export class ExpenseComponent {
       types: this.expenseTypeSvc.getActivesByCurrentUser(),
     }).subscribe(({ funds, types }) => {
       if (funds.Success) {
-        this.moneyFunds = funds.Data ?? [];
+        this.moneyFunds.set(funds.Data ?? []);
       }
       if (types.Success) {
-        this.expenseTypes = types.Data ?? [];
+        this.expenseTypes.set(types.Data ?? []);
       }
 
       this.loaderSvc.hide();

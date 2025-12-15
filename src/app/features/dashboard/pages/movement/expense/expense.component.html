@@ -20,9 +20,9 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Fondo</mat-label>
           <mat-select formControlName="MoneyFundId">
-            <mat-option *ngFor="let mf of moneyFunds" [value]="mf.Id">
-              {{ mf.Name }} ({{ mf.AccountType | accountTypeTranslate }})
-            </mat-option>
+            @for (mf of moneyFunds(); track mf.Id) {
+            <mat-option [value]="mf.Id"> {{ mf.Name }} ({{ mf.AccountType | accountTypeTranslate }}) </mat-option>
+            }
           </mat-select>
           <mat-error> Fondo es requerido. </mat-error>
         </mat-form-field>
@@ -39,9 +39,11 @@
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Tipo de documento</mat-label>
           <mat-select formControlName="DocumentType">
-            <mat-option *ngFor="let dt of documentTypes" [value]="dt.value">
+            @for (dt of documentTypes(); track $index) {
+            <mat-option [value]="dt.value">
               {{ dt.label }}
             </mat-option>
+            }
           </mat-select>
         </mat-form-field>
       </div>
@@ -67,9 +69,11 @@
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Tipo de gasto</mat-label>
             <mat-select formControlName="ExpenseTypeId">
-              <mat-option *ngFor="let et of expenseTypes" [value]="et.Id">
+              @for (et of expenseTypes(); track et.Id) {
+              <mat-option [value]="et.Id">
                 {{ et.Name }}
               </mat-option>
+              }
             </mat-select>
             <mat-error> Tipo de gasto es requerido </mat-error>
           </mat-form-field>

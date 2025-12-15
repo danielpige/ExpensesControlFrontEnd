@@ -32,8 +32,9 @@
   </form>
 </mat-card>
 
-<mat-card *ngIf="budgets && budgets.length > 0" class="mx-4">
-  <table mat-table [dataSource]="budgets" class="mat-elevation-z1 w-full">
+@if (budgets().length > 0) {
+<mat-card class="mx-4">
+  <table mat-table [dataSource]="budgets()" class="mat-elevation-z1 w-full">
     <ng-container matColumnDef="expenseTypeName">
       <th mat-header-cell *matHeaderCellDef>Tipo de gasto</th>
       <td mat-cell *matCellDef="let row">{{ row.ExpenseTypeName }}</td>
@@ -62,7 +63,8 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
   </table>
 </mat-card>
-
-<mat-card class="mx-4 p-3" *ngIf="budgets.length === 0">
+} @else {
+<mat-card class="mx-4 p-3">
   <p class="m-4">No hay presupuetos para este perido.</p>
 </mat-card>
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MoneyFundService } from './money-fund.service';
@@ -14,7 +14,7 @@ import { PageEvent } from '@angular/material/paginator';
 })
 export class MoneyFundComponent {
   displayedColumns = ['name', 'accountType', 'currentBalance', 'isActive', 'actions'];
-  dataSource: MoneyFund[] = [];
+  dataSource = signal<MoneyFund[]>([]);
   pagination: PageEvent = {
     pageIndex: 0,
     pageSize: 10,
@@ -52,13 +52,14 @@ export class MoneyFundComponent {
 
     this.moneyFundSvc.getAllByCurrentUser(this.pagination.pageIndex + 1, this.pagination.pageSize).subscribe({
       next: (res) => {
-        this.dataSource = res.Data.Items;
+        this.dataSource.set(res.Data.Items);
         this.pagination.length = res.Data.TotalCount;
         this.pagination.pageIndex = res.Data.PageNumber - 1;
         this.pagination.pageSize = res.Data.PageSize;
         this.loaderSvc.hide();
       },
-      error: (error) => {
+      error: () => {
+        this.dataSource.set([]);
         this.loaderSvc.hide();
       },
     });

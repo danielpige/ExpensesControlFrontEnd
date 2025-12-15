@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ChartData, ChartType } from '../../../../../shared/components/generic-chart/chart.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GraphicsService } from './graphics.service';
@@ -13,14 +13,15 @@ import { BudgetVsExecution } from '../../../../../core/models/graphic.model';
 export class GraphicsComponent implements OnInit {
   form!: FormGroup;
 
-  chartData: ChartData | null = null;
-  executionShareChartData: ChartData | null = null;
-  usageChartData: ChartData | null = null;
+  chartData = signal<ChartData | null>(null);
+  executionShareChartData = signal<ChartData | null>(null);
+  usageChartData = signal<ChartData | null>(null);
 
   constructor(private fb: FormBuilder, private graphicSvc: GraphicsService, private loaderSvc: LoaderService) {}
 
   ngOnInit(): void {
     this.initForm();
+    this.onSearch();
   }
 
   private initForm(): void {
@@ -63,7 +64,9 @@ export class GraphicsComponent implements OnInit {
 
   buildChartData(data: BudgetVsExecution[]): void {
     if (!data || data.length === 0) {
-      this.chartData = null;
+      this.chartData.set(null);
+      this.executionShareChartData.set(null);
+      this.usageChartData.set(null);
       return;
     }
 
@@ -71,18 +74,18 @@ export class GraphicsComponent implements OnInit {
     const budgets = data.map((x) => x.TotalBudget);
     const executed = data.map((x) => x.TotalExecuted);
 
-    this.chartData = {
+    this.chartData.set({
       categories,
       series: [
         { name: 'Presupuesto', data: budgets },
         { name: 'Ejecutado', data: executed },
       ],
-    };
+    });
 
-    this.executionShareChartData = {
+    this.executionShareChartData.set({
       categories,
       series: [{ name: 'Ejecutado', data: executed }],
-    };
+    });
 
     this.buildUsageChartData(data);
 
@@ -101,10 +104,10 @@ export class GraphicsComponent implements OnInit {
       usagePercentages.push(Number(usage.toFixed(2)));
     }
 
-    this.usageChartData = {
+    this.usageChartData.set({
       categories,
       series: [{ name: '% de presupuesto usado', data: usagePercentages }],
-    };
+    });
   }
 
   get chartType(): ChartType {

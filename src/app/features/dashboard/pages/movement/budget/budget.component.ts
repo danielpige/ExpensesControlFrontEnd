@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Budget } from '../../../../../core/models/budget.model';
 import { BudgetService } from './budget.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
@@ -16,7 +16,7 @@ import { MatDatepicker } from '@angular/material/datepicker';
 export class BudgetComponent implements OnInit {
   selectedYear = new Date().getFullYear();
   selectedMonth = new Date().getMonth();
-  budgets: Budget[] = [];
+  budgets = signal<Budget[]>([]);
   displayedColumns = ['expenseTypeName', 'amount', 'actions'];
   date: FormControl<Date | null> = new FormControl(new Date());
 
@@ -53,10 +53,11 @@ export class BudgetComponent implements OnInit {
 
     this.budgetSvc.getByPeriod(this.selectedYear, this.selectedMonth + 1).subscribe({
       next: (res) => {
-        this.budgets = res.Data ?? [];
+        this.budgets.set(res.Data ?? []);
         this.loaderSvc.hide();
       },
       error: () => {
+        this.budgets.set([]);
         this.loaderSvc.hide();
       },
     });

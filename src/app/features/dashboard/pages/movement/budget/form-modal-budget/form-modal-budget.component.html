@@ -18,9 +18,11 @@
       <mat-form-field appearance="outline" class="w-full">
         <mat-label>Tipo de gasto</mat-label>
         <mat-select formControlName="ExpenseTypeId">
-          <mat-option *ngFor="let et of expenseTypes" [value]="et.Id">
+          @for (et of expenseTypes(); track et.Id) {
+          <mat-option [value]="et.Id">
             {{ et.Name }}
           </mat-option>
+          }
         </mat-select>
         <mat-error> Expense type is required. </mat-error>
       </mat-form-field>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MovementService } from './movement.service';
 import { MoneyFundService } from '../../maintenance/money-fund/money-fund.service';
@@ -15,15 +15,15 @@ import { LoaderService } from '../../../../../core/services/loader.service';
 export class MovementComponent {
   form!: FormGroup;
 
-  moneyFunds: MoneyFund[] = [];
+  moneyFunds = signal<MoneyFund[]>([]);
   movements: Movement[] = [];
-  filteredMovements: Movement[] = [];
+  filteredMovements = signal<Movement[]>([]);
 
   displayedColumns = ['date', 'movementType', 'moneyFundName', 'amount', 'description'];
 
-  totalDeposits = 0;
-  totalExpenses = 0;
-  netBalance = 0;
+  totalDeposits = signal<number>(0);
+  totalExpenses = signal<number>(0);
+  netBalance = signal<number>(0);
 
   constructor(
     private fb: FormBuilder,
@@ -51,7 +51,7 @@ export class MovementComponent {
 
     this.moneyFundSvc.getActivesByCurrentUser().subscribe({
       next: (res) => {
-        this.moneyFunds = res.Data ?? [];
+        this.moneyFunds.set(res.Data ?? []);
         this.laoderSvc.hide();
       },
       error: () => {
@@ -96,9 +96,9 @@ export class MovementComponent {
   applyFilter(): void {
     const typeFilter = this.form.value.movementType;
     if (!typeFilter || typeFilter === 'All') {
-      this.filteredMovements = [...this.movements];
+      this.filteredMovements.set([...this.movements]);
     } else {
-      this.filteredMovements = this.movements.filter((m) => m.MovementType === typeFilter);
+      this.filteredMovements.set(this.movements.filter((m) => m.MovementType === typeFilter));
     }
   }
 
@@ -111,7 +111,7 @@ export class MovementComponent {
     let deposits = 0;
     let expenses = 0;
 
-    for (const m of this.filteredMovements) {
+    for (const m of this.filteredMovements()) {
       if (m.MovementType === 'Deposit') {
         deposits += m.Amount;
       } else if (m.MovementType === 'Expense') {
@@ -119,8 +119,8 @@ export class MovementComponent {
       }
     }
 
-    this.totalDeposits = deposits;
-    this.totalExpenses = expenses;
-    this.netBalance = deposits - expenses;
+    this.totalDeposits.set(deposits);
+    this.totalExpenses.set(expenses);
+    this.netBalance.set(deposits - expenses);
   }
 }

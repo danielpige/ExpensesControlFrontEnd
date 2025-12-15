@@ -11,8 +11,9 @@
   </button>
 </div>
 
-<mat-card class="mx-4" *ngIf="dataSource.length !== 0">
-  <table mat-table [dataSource]="dataSource" class="mat-elevation-z1 w-full">
+@if (dataSource().length > 0) {
+<mat-card class="mx-4">
+  <table mat-table [dataSource]="dataSource()" class="mat-elevation-z1 w-full">
     <!-- Code Column -->
     <ng-container matColumnDef="code">
       <th mat-header-cell *matHeaderCellDef>Código</th>
@@ -60,7 +61,8 @@
   >
   </mat-paginator>
 </mat-card>
-
-<mat-card class="mx-4 p-3" *ngIf="dataSource.length === 0">
+} @else {
+<mat-card class="mx-4 p-3">
   <p class="m-4">No hay datos para mostrar.</p>
 </mat-card>
+}
