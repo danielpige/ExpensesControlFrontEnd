@@ -29,6 +29,16 @@ export class HttpService {
       .pipe(catchError((error) => this.handleError(error)));
   }
 
+  getBlob(url: string, params?: any, headers?: any): Observable<Blob> {
+    return this.http
+      .get(this.baseUrl + url, {
+        params: new HttpParams({ fromObject: params }),
+        headers: new HttpHeaders(headers ?? {}),
+        responseType: 'blob',
+      })
+      .pipe(catchError((error) => this.handleError(error)));
+  }
+
   post<T>(url: string, body: any, headers?: any): Observable<T> {
     return this.http
       .post<T>(this.baseUrl + url, body, {

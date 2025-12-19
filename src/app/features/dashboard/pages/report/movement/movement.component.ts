@@ -18,6 +18,7 @@ export class MovementComponent {
   private movementSvc = inject(MovementService);
   private moneyFundSvc = inject(MoneyFundService);
   private laoderSvc = inject(LoaderService);
+  private snackBarSvc = inject(SnackBarService);
 
   private title = inject(Title);
   form!: FormGroup;
@@ -58,6 +59,38 @@ export class MovementComponent {
         this.laoderSvc.hide();
       },
       error: () => {
+        this.laoderSvc.hide();
+      },
+    });
+  }
+
+  exportData(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.laoderSvc.show();
+
+    const raw = this.form.getRawValue();
+    const from = this.toDateOnlyString(raw.fromDate as Date);
+    const to = this.toDateOnlyString(raw.toDate as Date);
+    const moneyFundId = raw.moneyFundId || undefined;
+
+    this.movementSvc.exportData(from, to, moneyFundId).subscribe({
+      next: (blob: Blob) => {
+        console.log(blob);
+
+        this.laoderSvc.hide();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `movements_${from.substring(0, 10)}_${to.substring(0, 10)}.xlsx`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.snackBarSvc.error('Ocurrió un error al tratar de exportar data.');
         this.laoderSvc.hide();
       },
     });
