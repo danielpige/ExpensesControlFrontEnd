@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MovementService } from './movement.service';
 import { MoneyFundService } from '../../maintenance/money-fund/money-fund.service';
@@ -7,38 +7,49 @@ import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { Movement, MovementType } from '../../../../../core/models/movement.model';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { Title } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-movement',
   templateUrl: './movement.component.html',
   styleUrl: './movement.component.scss',
 })
-export class MovementComponent {
+export class MovementComponent implements OnInit {
   private fb = inject(FormBuilder);
   private movementSvc = inject(MovementService);
   private moneyFundSvc = inject(MoneyFundService);
-  private laoderSvc = inject(LoaderService);
+  private loaderSvc = inject(LoaderService);
   private snackBarSvc = inject(SnackBarService);
+  private destroyRef = inject(DestroyRef);
 
   private title = inject(Title);
   form!: FormGroup;
 
   moneyFunds = signal<MoneyFund[]>([]);
-  movements: Movement[] = [];
-  filteredMovements = signal<Movement[]>([]);
+  movements = signal<Movement[]>([]);
 
-  displayedColumns = ['date', 'movementType', 'moneyFundName', 'amount', 'description'];
+  filteredMovements = computed(() => {
+    const list = this.movements();
+    const type = this.form.get('movementType')!.value;
+    if (!type || type === 'All') return list;
+    return list.filter((m) => m.MovementType === type);
+  });
+  totalDeposits = computed(() =>
+    this.filteredMovements().reduce((acc, m) => acc + (m.MovementType === MovementType.DEPOSIT ? m.Amount : 0), 0)
+  );
+  totalExpenses = computed(() =>
+    this.filteredMovements().reduce((acc, m) => acc + (m.MovementType === MovementType.EXPENSE ? m.Amount : 0), 0)
+  );
+  netBalance = computed(() => this.totalDeposits() - this.totalExpenses());
 
-  totalDeposits = signal<number>(0);
-  totalExpenses = signal<number>(0);
-  netBalance = signal<number>(0);
-
-  constructor() {}
+  readonly displayedColumns = ['date', 'movementType', 'moneyFundName', 'amount', 'description'];
 
   ngOnInit(): void {
     this.title.setTitle('Consulta de movimientos');
     this.initForm();
     this.loadMoneyFunds();
+    this.onSearch();
   }
 
   initForm(): void {
@@ -51,17 +62,22 @@ export class MovementComponent {
   }
 
   loadMoneyFunds(): void {
-    this.laoderSvc.show();
+    this.loaderSvc.show();
 
-    this.moneyFundSvc.getActivesByCurrentUser().subscribe({
-      next: (res) => {
-        this.moneyFunds.set(res.Data ?? []);
-        this.laoderSvc.hide();
-      },
-      error: () => {
-        this.laoderSvc.hide();
-      },
-    });
+    this.moneyFundSvc
+      .getActivesByCurrentUser()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loaderSvc.hide())
+      )
+      .subscribe({
+        next: (res) => {
+          this.moneyFunds.set(res.Data ?? []);
+        },
+        error: () => {
+          this.moneyFunds.set([]);
+        },
+      });
   }
 
   exportData(): void {
@@ -70,30 +86,27 @@ export class MovementComponent {
       return;
     }
 
-    this.laoderSvc.show();
+    this.loaderSvc.show();
 
-    const raw = this.form.getRawValue();
-    const from = this.toDateOnlyString(raw.fromDate as Date);
-    const to = this.toDateOnlyString(raw.toDate as Date);
-    const moneyFundId = raw.moneyFundId || undefined;
-
-    this.movementSvc.exportData(from, to, moneyFundId).subscribe({
-      next: (blob: Blob) => {
-        console.log(blob);
-
-        this.laoderSvc.hide();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `movements_${from.substring(0, 10)}_${to.substring(0, 10)}.xlsx`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: () => {
-        this.snackBarSvc.error('Ocurrió un error al tratar de exportar data.');
-        this.laoderSvc.hide();
-      },
-    });
+    this.movementSvc
+      .exportData(this.buildQuery.from, this.buildQuery.to, this.buildQuery.moneyFundId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loaderSvc.hide())
+      )
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `movements_${this.buildQuery.from.substring(0, 10)}_${this.buildQuery.to.substring(0, 10)}.xlsx`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: () => {
+          this.snackBarSvc.error('Ocurrió un error al tratar de exportar data.');
+        },
+      });
   }
 
   private toDateOnlyString(d: Date): string {
@@ -109,54 +122,31 @@ export class MovementComponent {
       return;
     }
 
-    this.laoderSvc.show();
+    this.loaderSvc.show();
 
+    this.movementSvc
+      .getByDateRange(this.buildQuery.from, this.buildQuery.to, this.buildQuery.moneyFundId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loaderSvc.hide())
+      )
+      .subscribe({
+        next: (res) => {
+          this.movements.set(res.Data);
+        },
+        error: () => {
+          this.movements.set([]);
+        },
+      });
+  }
+
+  private get buildQuery() {
     const raw = this.form.getRawValue();
-    const from = this.toDateOnlyString(raw.fromDate as Date);
-    const to = this.toDateOnlyString(raw.toDate as Date);
-    const moneyFundId = raw.moneyFundId || undefined;
-
-    this.movementSvc.getByDateRange(from, to, moneyFundId).subscribe({
-      next: (res) => {
-        this.movements = res.Data;
-        this.applyFilter();
-        this.calculateTotals();
-        this.laoderSvc.hide();
-      },
-      error: () => {
-        this.laoderSvc.hide();
-      },
-    });
-  }
-
-  applyFilter(): void {
-    const typeFilter = this.form.value.movementType;
-    if (!typeFilter || typeFilter === 'All') {
-      this.filteredMovements.set([...this.movements]);
-    } else {
-      this.filteredMovements.set(this.movements.filter((m) => m.MovementType === typeFilter));
-    }
-  }
-
-  onMovementTypeChange(): void {
-    this.applyFilter();
-    this.calculateTotals();
-  }
-
-  private calculateTotals(): void {
-    let deposits = 0;
-    let expenses = 0;
-
-    for (const m of this.filteredMovements()) {
-      if (m.MovementType === 'Deposit') {
-        deposits += m.Amount;
-      } else if (m.MovementType === 'Expense') {
-        expenses += m.Amount;
-      }
-    }
-
-    this.totalDeposits.set(deposits);
-    this.totalExpenses.set(expenses);
-    this.netBalance.set(deposits - expenses);
+    return {
+      from: this.toDateOnlyString(raw.fromDate as Date),
+      to: this.toDateOnlyString(raw.toDate as Date),
+      moneyFundId: raw.moneyFundId ?? undefined,
+      movementType: raw.movementType as MovementType | 'All',
+    };
   }
 }

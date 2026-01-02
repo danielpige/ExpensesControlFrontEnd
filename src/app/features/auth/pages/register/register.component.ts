@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RegisterForm, RegisterValues } from '../../../../core/models/user.model';
 import { LoaderService } from '../../../../core/services/loader.service';
@@ -6,6 +6,8 @@ import { AuthenticationService } from '../../service/authentication.service';
 import { Router } from '@angular/router';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { passwordMatchValidator } from '../../../../core/utils/validators/password-match.validator';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -18,13 +20,12 @@ export class RegisterComponent implements OnInit {
   private authenticationSvc = inject(AuthenticationService);
   private router = inject(Router);
   private snackBar = inject(SnackBarService);
+  private destroyRef = inject(DestroyRef);
 
   registerForm!: FormGroup<RegisterForm>;
-
+  submitting = false;
   hidePassword = signal(true);
   hideConfirmPassword = signal(true);
-
-  constructor() {}
 
   ngOnInit(): void {
     this.initForm();
@@ -55,22 +56,28 @@ export class RegisterComponent implements OnInit {
     }
 
     this.loaderSvc.show();
+    this.submitting = true;
 
     const data = this.registerForm.value as RegisterValues;
 
-    this.authenticationSvc.registerUser(data).subscribe({
-      next: (res) => {
-        if (res.Success) {
-          this.snackBar.success('Te has registrado e iniciado sesión correctamente.');
+    this.authenticationSvc
+      .registerUser(data)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
           this.loaderSvc.hide();
-          this.router.navigate(['/dashboard']);
-        }
-      },
-      error: (error) => {
-        this.snackBar.error(error.error.message);
-        this.loaderSvc.hide();
-      },
-    });
+          this.submitting = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.Success) {
+            this.snackBar.success('Te has registrado e iniciado sesión correctamente.');
+
+            this.router.navigate(['/dashboard']);
+          }
+        },
+      });
   }
 
   get confirmPassword(): AbstractControl<string> {

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MoneyFundService } from '../../maintenance/money-fund/money-fund.service';
 import { ExpenseTypeService } from '../../maintenance/expense-type/expense-type.service';
@@ -7,11 +7,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { ExpenseType } from '../../../../../core/models/expenseType.model';
 import { BudgetOverrun, DocumentType, Expense } from '../../../../../core/models/expense.model';
-import { forkJoin } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { ExpenseOverrunModalComponent } from './expense-overrun-modal/expense-overrun-modal.component';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { Title } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-expense',
@@ -26,20 +27,20 @@ export class ExpenseComponent {
   private snackBarSvc = inject(SnackBarService);
   private dialog = inject(MatDialog);
   private loaderSvc = inject(LoaderService);
-
+  private destroyRef = inject(DestroyRef);
   private title = inject(Title);
+
   form!: FormGroup;
 
   moneyFunds = signal<MoneyFund[]>([]);
   expenseTypes = signal<ExpenseType[]>([]);
+  submitting = false;
 
   documentTypes = signal([
     { value: DocumentType.Receipt, label: 'Recibo' },
     { value: DocumentType.Invoice, label: 'Factura' },
     { value: DocumentType.Other, label: 'Otro' },
   ]);
-
-  constructor() {}
 
   ngOnInit(): void {
     this.title.setTitle('Gastos');
@@ -65,16 +66,19 @@ export class ExpenseComponent {
     forkJoin({
       funds: this.moneyFundSvc.getActivesByCurrentUser(),
       types: this.expenseTypeSvc.getActivesByCurrentUser(),
-    }).subscribe(({ funds, types }) => {
-      if (funds.Success) {
-        this.moneyFunds.set(funds.Data ?? []);
-      }
-      if (types.Success) {
-        this.expenseTypes.set(types.Data ?? []);
-      }
-
-      this.loaderSvc.hide();
-    });
+    })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loaderSvc.hide())
+      )
+      .subscribe(({ funds, types }) => {
+        if (funds.Success) {
+          this.moneyFunds.set(funds.Data ?? []);
+        }
+        if (types.Success) {
+          this.expenseTypes.set(types.Data ?? []);
+        }
+      });
   }
 
   addDetailRow(): void {
@@ -98,25 +102,33 @@ export class ExpenseComponent {
     }
 
     this.loaderSvc.show();
+    this.submitting = true;
 
     const dto: Expense = this.form.getRawValue();
     dto.Date = this.toDateOnlyString(new Date(dto.Date));
 
-    this.expenseSvc.create(dto).subscribe({
-      next: (res) => {
-        const { ExpenseId, Overruns } = res.Data;
+    this.expenseSvc
+      .create(dto)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loaderSvc.hide();
+          this.submitting = true;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          const { ExpenseId, Overruns } = res.Data;
 
-        if (Overruns && Overruns.length > 0) {
-          this.openOverrunDialog(Overruns);
-        } else {
-          this.snackBarSvc.success('Gasto registrado con éxito.');
-        }
+          if (Overruns && Overruns.length > 0) {
+            this.openOverrunDialog(Overruns);
+          } else {
+            this.snackBarSvc.success('Gasto registrado con éxito.');
+          }
 
-        this.loaderSvc.hide();
-
-        this.resetForm();
-      },
-    });
+          this.resetForm();
+        },
+      });
   }
 
   private toDateOnlyString(d: Date): string {

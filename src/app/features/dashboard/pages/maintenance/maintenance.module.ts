@@ -8,9 +8,11 @@ import { FormModalComponent } from './expense-type/form-modal/form-modal.compone
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MoneyFundComponent } from './money-fund/money-fund.component';
 import { FormModalMoneyFundComponent } from './money-fund/form-modal-money-fund/form-modal-money-fund.component';
+import { AccountTypeTranslatePipe } from '../../../../shared/pipes/account-type-translate.pipe';
 
 @NgModule({
   declarations: [ExpenseTypeComponent, FormModalComponent, MoneyFundComponent, FormModalMoneyFundComponent],
   imports: [CommonModule, MaintenanceRoutingModule, SharedModule, ReactiveFormsModule, FormsModule],
+  providers: [AccountTypeTranslatePipe],
 })
 export class MaintenanceModule {}

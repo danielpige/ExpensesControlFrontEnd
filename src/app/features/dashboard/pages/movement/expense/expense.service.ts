@@ -11,8 +11,6 @@ export class ExpenseService {
 
   private baseUrl = 'Expenses';
 
-  constructor() {}
-
   create(dto: Expense) {
     return this.httpSvc.post<ApiResponse<CreateExpenseResponse>>(this.baseUrl, dto);
   }

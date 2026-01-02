@@ -11,8 +11,6 @@ export class NavBarComponent {
   private authSvc = inject(AuthService);
   private router = inject(Router);
 
-  constructor() {}
-
   logOut(): void {
     this.authSvc.logout();
     this.router.navigate(['/auth/login']);

@@ -11,8 +11,6 @@ export class GraphicsService {
 
   private baseUrl = 'Reports';
 
-  constructor() {}
-
   getBudgetVsExecution(from: string, to: string) {
     const url = `${this.baseUrl}/budget-vs-execution?from=${from}&to=${to}`;
     return this.httpSvc.get<ApiResponse<BudgetVsExecution[]>>(url);

@@ -1,10 +1,12 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { ChartData, ChartType } from '../../../../../shared/components/generic-chart/chart.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GraphicsService } from './graphics.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { BudgetVsExecution } from '../../../../../core/models/graphic.model';
 import { Title } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-graphics',
@@ -15,12 +17,12 @@ export class GraphicsComponent implements OnInit {
   private fb = inject(FormBuilder);
   private graphicSvc = inject(GraphicsService);
   private loaderSvc = inject(LoaderService);
+  private destroyRef = inject(DestroyRef);
 
   private title = inject(Title);
   form!: FormGroup;
 
   private budgetVsExecution = signal<BudgetVsExecution[] | null>(null);
-
   chartData = computed<ChartData | null>(() => {
     const data = this.budgetVsExecution();
     if (!data?.length) return null;
@@ -37,7 +39,6 @@ export class GraphicsComponent implements OnInit {
       ],
     };
   });
-
   executionShareChartData = computed<ChartData | null>(() => {
     const data = this.budgetVsExecution();
     if (!data?.length) return null;
@@ -50,7 +51,6 @@ export class GraphicsComponent implements OnInit {
       series: [{ name: 'Ejecutado', data: executed }],
     };
   });
-
   usageChartData = computed<ChartData | null>(() => {
     const data = this.budgetVsExecution();
     if (!data?.length) return null;
@@ -70,8 +70,6 @@ export class GraphicsComponent implements OnInit {
       series: [{ name: '% de presupuesto usado', data: usagePercentages }],
     };
   });
-
-  constructor() {}
 
   ngOnInit(): void {
     this.title.setTitle('Gráficos de presupuestos y gastos');
@@ -106,16 +104,20 @@ export class GraphicsComponent implements OnInit {
     const from = this.toDateOnlyString(raw.fromDate as Date);
     const to = this.toDateOnlyString(raw.toDate as Date);
 
-    this.graphicSvc.getBudgetVsExecution(from, to).subscribe({
-      next: (res) => {
-        this.budgetVsExecution.set(res.Data);
-        this.loaderSvc.hide();
-      },
-      error: () => {
-        this.budgetVsExecution.set([]);
-        this.loaderSvc.hide();
-      },
-    });
+    this.graphicSvc
+      .getBudgetVsExecution(from, to)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loaderSvc.hide())
+      )
+      .subscribe({
+        next: (res) => {
+          this.budgetVsExecution.set(res.Data);
+        },
+        error: () => {
+          this.budgetVsExecution.set([]);
+        },
+      });
   }
 
   get chartType(): ChartType {

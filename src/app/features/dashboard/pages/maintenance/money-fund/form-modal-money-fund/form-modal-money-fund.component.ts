@@ -1,10 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { AccountType, AccountTypeEs, MoneyFund } from '../../../../../../core/models/moneyFund.model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoaderService } from '../../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../../core/services/snack-bar.service';
 import { MoneyFundService } from '../money-fund.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-form-modal-money-fund',
@@ -16,14 +18,14 @@ export class FormModalMoneyFundComponent {
   private loaderSvc = inject(LoaderService);
   private moneyFundSvc = inject(MoneyFundService);
   private snackBarSvc = inject(SnackBarService);
+  private destroyRef = inject(DestroyRef);
 
   readonly dialogRef = inject(MatDialogRef<FormModalMoneyFundComponent>);
   readonly data = inject<MoneyFund>(MAT_DIALOG_DATA);
+  submitting = false;
   accountTypes = Object.values(AccountType);
   accountTypeEs = AccountTypeEs;
   form!: FormGroup;
-
-  constructor() {}
 
   ngOnInit(): void {
     this.initForm();
@@ -61,16 +63,20 @@ export class FormModalMoneyFundComponent {
     const dataForm = this.form.getRawValue();
     const query = this.data ? this.moneyFundSvc.update(this.data.Id as number, dataForm) : this.moneyFundSvc.create(dataForm);
 
-    query.subscribe({
-      next: (res) => {
-        this.snackBarSvc.success('Los datos han sido guardados con éxito.');
-        this.dialogRef.close(true);
-        this.loaderSvc.hide();
-      },
-      error: () => {
-        this.loaderSvc.hide();
-      },
-    });
+    query
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loaderSvc.hide();
+          this.submitting = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.snackBarSvc.success('Los datos han sido guardados con éxito.');
+          this.dialogRef.close(true);
+        },
+      });
   }
 
   get InitialBalance(): AbstractControl<number> | null {

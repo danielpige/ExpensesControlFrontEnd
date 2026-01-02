@@ -1,0 +1,9 @@
+@switch (column.type) { @case (columnTypes.BOOLEAN) {
+<mat-slide-toggle disabled [checked]="data[column.propertyValue]"></mat-slide-toggle>
+} @case (columnTypes.TEXT) {
+<span>{{ data[column.propertyValue] }}</span>
+} @case (columnTypes.DATE) {
+<span>{{ data[column.propertyValue] | date : 'short' }}</span>
+} @case (columnTypes.MONEY) {
+<span>{{ data[column.propertyValue] | number : '1.2-2' }}</span>
+} }

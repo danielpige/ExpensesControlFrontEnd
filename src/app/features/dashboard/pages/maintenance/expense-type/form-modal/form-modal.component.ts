@@ -1,10 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ExpenseType } from '../../../../../../core/models/expenseType.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoaderService } from '../../../../../../core/services/loader.service';
 import { ExpenseTypeService } from '../expense-type.service';
 import { SnackBarService } from '../../../../../../core/services/snack-bar.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-form-modal',
@@ -16,12 +18,12 @@ export class FormModalComponent implements OnInit {
   private loaderSvc = inject(LoaderService);
   private expenseTypeSvc = inject(ExpenseTypeService);
   private snackBarSvc = inject(SnackBarService);
+  private destroyRef = inject(DestroyRef);
 
+  submitting = false;
   readonly dialogRef = inject(MatDialogRef<FormModalComponent>);
   readonly data = inject<ExpenseType>(MAT_DIALOG_DATA);
   form!: FormGroup;
-
-  constructor() {}
 
   ngOnInit(): void {
     this.initForm();
@@ -52,15 +54,19 @@ export class FormModalComponent implements OnInit {
     const dataForm = this.form.getRawValue();
     const query = this.data ? this.expenseTypeSvc.update(this.data.Id as number, dataForm) : this.expenseTypeSvc.create(dataForm);
 
-    query.subscribe({
-      next: (res) => {
-        this.snackBarSvc.success('Los datos han sido guardados con éxito.');
-        this.dialogRef.close(true);
-        this.loaderSvc.hide();
-      },
-      error: () => {
-        this.loaderSvc.hide();
-      },
-    });
+    query
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loaderSvc.hide();
+          this.submitting = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.snackBarSvc.success('Los datos han sido guardados con éxito.');
+          this.dialogRef.close(true);
+        },
+      });
   }
 }

@@ -11,8 +11,6 @@ export class MoneyFundService {
 
   private baseUrl = 'MoneyFunds';
 
-  constructor() {}
-
   getActives() {
     return this.httpSvc.get<ApiResponse<MoneyFund[]>>(`${this.baseUrl}/actives`);
   }

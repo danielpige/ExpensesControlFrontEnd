@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Budget } from '../../../../../core/models/budget.model';
 import { BudgetService } from './budget.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
@@ -8,6 +8,9 @@ import { FormModalBudgetComponent } from './form-modal-budget/form-modal-budget.
 import { FormControl } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { Title } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, finalize } from 'rxjs';
+import { Actions, Columns, ColumnTypes } from '../../../../../shared/components/generic-table/generic-table.type';
 
 @Component({
   selector: 'app-budget',
@@ -19,11 +22,37 @@ export class BudgetComponent implements OnInit {
   private loaderSvc = inject(LoaderService);
   private dialog = inject(MatDialog);
   private snackBarSvc = inject(SnackBarService);
-
+  private destroyRef = inject(DestroyRef);
   private title = inject(Title);
+
   selectedYear = new Date().getFullYear();
-  selectedMonth = new Date().getMonth();
-  budgets = signal<Budget[]>([]);
+  selectedMonth = new Date().getMonth() + 1;
+  dataSource = signal<Budget[]>([]);
+  actions: Actions[] = [
+    {
+      title: 'Editar',
+      event: 'edit',
+      icon: 'edit',
+    },
+    {
+      title: 'Deshabilitar',
+      event: 'delete',
+      icon: 'delete_forever',
+    },
+  ];
+  columns: Columns[] = [
+    {
+      title: 'Tipo de gasto',
+      propertyValue: 'ExpenseTypeName',
+      type: ColumnTypes.TEXT,
+    },
+    {
+      title: 'Monto',
+      propertyValue: 'Amount',
+      type: ColumnTypes.MONEY,
+    },
+  ];
+  loading = signal(true);
   displayedColumns = ['expenseTypeName', 'amount', 'actions'];
   date: FormControl<Date | null> = new FormControl(new Date());
 
@@ -42,8 +71,6 @@ export class BudgetComponent implements OnInit {
     { value: 12, label: 'Diciembre' },
   ];
 
-  constructor() {}
-
   ngOnInit(): void {
     this.title.setTitle('Presupuestos');
     this.onSearch();
@@ -53,17 +80,25 @@ export class BudgetComponent implements OnInit {
     if (!this.selectedYear || !this.selectedMonth) return;
 
     this.loaderSvc.show();
+    this.loading.set(true);
 
-    this.budgetSvc.getByPeriod(this.selectedYear, this.selectedMonth + 1).subscribe({
-      next: (res) => {
-        this.budgets.set(res.Data ?? []);
-        this.loaderSvc.hide();
-      },
-      error: () => {
-        this.budgets.set([]);
-        this.loaderSvc.hide();
-      },
-    });
+    this.budgetSvc
+      .getByPeriod(this.selectedYear, this.selectedMonth)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loaderSvc.hide();
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.dataSource.set(res.Data ?? []);
+        },
+        error: () => {
+          this.dataSource.set([]);
+        },
+      });
   }
 
   openFormModal(data: Budget | null = null): void {
@@ -72,45 +107,56 @@ export class BudgetComponent implements OnInit {
       data: {
         data,
         year: this.selectedYear,
-        month: this.selectedMonth + 1,
+        month: this.selectedMonth,
       },
     });
 
-    dialog.afterClosed().subscribe({
-      next: (refresh: boolean | undefined) => {
-        if (refresh) {
+    dialog
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef), filter(Boolean))
+      .subscribe({
+        next: () => {
           this.onSearch();
-        }
-      },
-    });
+        },
+      });
   }
 
   deleteBudget(budget: Budget): void {
     this.loaderSvc.show();
 
-    this.budgetSvc.delete(budget.Id as number).subscribe({
-      next: () => {
-        this.snackBarSvc.success('presupuesto eliminado con éxito.');
-        this.loaderSvc.hide();
-        this.onSearch();
-      },
-      error: () => {
-        this.loaderSvc.hide();
-      },
-    });
+    this.budgetSvc
+      .delete(budget.Id as number)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loaderSvc.hide())
+      )
+      .subscribe({
+        next: () => {
+          this.snackBarSvc.success('presupuesto eliminado con éxito.');
+          this.onSearch();
+        },
+      });
   }
 
   setMonthAndYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>) {
-    const ctrlValue = this.date?.value ?? new Date();
+    const year = normalizedMonthAndYear.getFullYear();
+    const monthIndex = normalizedMonthAndYear.getMonth();
 
-    ctrlValue.setMonth(normalizedMonthAndYear.getMonth());
-    ctrlValue.setFullYear(normalizedMonthAndYear.getFullYear());
-    ctrlValue.setDate(1);
+    this.selectedYear = year;
+    this.selectedMonth = monthIndex + 1;
 
-    this.selectedMonth = normalizedMonthAndYear.getMonth();
-    this.selectedYear = normalizedMonthAndYear.getFullYear();
-    this.date?.setValue(ctrlValue);
+    this.date.setValue(new Date(year, monthIndex, 1));
 
     datepicker.close();
+  }
+
+  onSelecteAction(actionEvent: { event: string; item: Budget }): void {
+    if (actionEvent.event === 'edit') {
+      this.openFormModal(actionEvent.item);
+    }
+
+    if (actionEvent.event === 'delete') {
+      this.deleteBudget(actionEvent.item);
+    }
   }
 }

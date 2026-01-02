@@ -41,7 +41,9 @@
         </div>
 
         <div class="mx-auto w-full max-w-xs">
-          <button class="w-full" (click)="submitForm()" type="button" color="primary" mat-flat-button>Iniciar sesión</button>
+          <button class="w-full" (click)="submitForm()" [disabled]="submitting" type="button" color="primary" mat-flat-button>
+            Iniciar sesión
+          </button>
         </div>
       </div>
     </div>

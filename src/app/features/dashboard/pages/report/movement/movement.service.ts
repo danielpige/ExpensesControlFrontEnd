@@ -13,8 +13,6 @@ export class MovementService {
 
   private baseUrl = 'Movements';
 
-  constructor() {}
-
   getByDateRange(from: string, to: string, moneyFundId?: number): Observable<ApiResponse<Movement[]>> {
     let url = `${this.baseUrl}`;
     let params = {
