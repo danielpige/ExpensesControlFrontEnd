@@ -11,8 +11,6 @@ export class BudgetService {
 
   private baseUrl = 'Budgets';
 
-  constructor() {}
-
   getByPeriod(year: number, month: number) {
     return this.httpSvc.get<ApiResponse<Budget[]>>(`${this.baseUrl}?year=${year}&month=${month}`);
   }

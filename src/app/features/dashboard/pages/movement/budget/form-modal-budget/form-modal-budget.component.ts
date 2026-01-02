@@ -1,13 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Budget } from '../../../../../../core/models/budget.model';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoaderService } from '../../../../../../core/services/loader.service';
 import { BudgetService } from '../budget.service';
 import { ExpenseTypeService } from '../../../maintenance/expense-type/expense-type.service';
 import { SnackBarService } from '../../../../../../core/services/snack-bar.service';
 import { ExpenseType } from '../../../../../../core/models/expenseType.model';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-form-modal-budget',
@@ -20,13 +22,13 @@ export class FormModalBudgetComponent {
   private budgetSvc = inject(BudgetService);
   private expenseTypeSvc = inject(ExpenseTypeService);
   private snackBarSvc = inject(SnackBarService);
+  private destroyRef = inject(DestroyRef);
 
   readonly dialogRef = inject(MatDialogRef<FormModalBudgetComponent>);
   readonly data = inject<{ data: Budget; month: number; year: number }>(MAT_DIALOG_DATA);
   form!: FormGroup;
   expenseTypes = signal<ExpenseType[]>([]);
-
-  constructor() {}
+  submitting = false;
 
   ngOnInit(): void {
     this.initForm();
@@ -43,14 +45,17 @@ export class FormModalBudgetComponent {
   }
 
   getExpeseTypes(): void {
-    this.expenseTypeSvc.getActivesByCurrentUser().subscribe({
-      next: (res) => {
-        this.expenseTypes.set(res.Data ?? []);
-      },
-      error: () => {
-        this.expenseTypes.set([]);
-      },
-    });
+    this.expenseTypeSvc
+      .getActivesByCurrentUser()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.expenseTypes.set(res.Data ?? []);
+        },
+        error: () => {
+          this.expenseTypes.set([]);
+        },
+      });
   }
 
   initForm(): void {
@@ -69,6 +74,7 @@ export class FormModalBudgetComponent {
       return;
     }
 
+    this.submitting = true;
     this.loaderSvc.show();
 
     const dataForm = this.form.getRawValue();
@@ -76,16 +82,20 @@ export class FormModalBudgetComponent {
 
     const query = this.data.data ? this.budgetSvc.update(this.data.data.Id as number, dataForm) : this.budgetSvc.create(dataForm);
 
-    query.subscribe({
-      next: (res) => {
-        this.snackBarSvc.success('Los datos han sido guardados con éxito.');
-        this.dialogRef.close(true);
-        this.loaderSvc.hide();
-      },
-      error: () => {
-        this.loaderSvc.hide();
-      },
-    });
+    query
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loaderSvc.hide();
+          this.submitting = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.snackBarSvc.success('Los datos han sido guardados con éxito.');
+          this.dialogRef.close(true);
+        },
+      });
   }
 
   setMonthAndYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>) {

@@ -1,7 +1,7 @@
 export interface MoneyFund {
   Id?: number;
   Name: string;
-  AccountType: AccountType;
+  AccountType: AccountType | string;
   InitialBalance?: string;
   CurrentBalance?: string;
   IsActive?: boolean;

@@ -4,7 +4,7 @@
 
 <mat-divider></mat-divider>
 
-<form class="mt-4 mx-4 p-4" [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
+<form class="mt-2 mx-4 p-4" [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="form">
   <mat-card class="mb-3 p-4">
     <div class="grid grid-cols-2 gap-4">
       <div class="">
@@ -107,6 +107,6 @@
   </mat-card>
 
   <div class="mt-3 flex justify-end">
-    <button mat-raised-button color="primary" type="submit">Guardar gasto</button>
+    <button mat-raised-button color="primary" [disabled]="submitting" type="submit">Guardar gasto</button>
   </div>
 </form>

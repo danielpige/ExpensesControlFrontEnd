@@ -18,8 +18,6 @@ export class HttpService {
 
   private readonly baseUrl = environment.apiUrl;
 
-  constructor() {}
-
   get<T>(url: string, params?: any, headers?: any): Observable<T> {
     return this.http
       .get<T>(this.baseUrl + url, {

@@ -9,8 +9,6 @@ export class NoAuthGuard implements CanActivate {
   private authSvc = inject(AuthService);
   private router = inject(Router);
 
-  constructor() {}
-
   canActivate(): boolean | UrlTree {
     const isLoggedIn = this.authSvc.isAuthenticated();
 

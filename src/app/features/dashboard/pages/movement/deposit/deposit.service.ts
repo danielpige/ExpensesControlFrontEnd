@@ -11,8 +11,6 @@ export class DepositService {
 
   private baseUrl = 'Deposits';
 
-  constructor() {}
-
   create(dto: Deposit) {
     return this.httpSvc.post<ApiResponse<Deposit>>(this.baseUrl, dto);
   }

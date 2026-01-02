@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 import { DepositService } from './deposit.service';
@@ -6,6 +6,8 @@ import { MoneyFundService } from '../../maintenance/money-fund/money-fund.servic
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
 import { Title } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-deposit',
@@ -18,13 +20,12 @@ export class DepositComponent {
   private moneyFundSvc = inject(MoneyFundService);
   private snackBarSvc = inject(SnackBarService);
   private loaderSvc = inject(LoaderService);
+  private destroyRef = inject(DestroyRef);
 
   private title = inject(Title);
   form!: FormGroup;
-
+  submitting = false;
   moneyFunds = signal<MoneyFund[]>([]);
-
-  constructor() {}
 
   ngOnInit(): void {
     this.title.setTitle('Depósitos');
@@ -44,16 +45,20 @@ export class DepositComponent {
   loadMoneyFunds() {
     this.loaderSvc.show();
 
-    this.moneyFundSvc.getActivesByCurrentUser().subscribe({
-      next: (res) => {
-        this.moneyFunds.set(res.Data ?? []);
-        this.loaderSvc.hide();
-      },
-      error: () => {
-        this.moneyFunds.set([]);
-        this.loaderSvc.hide();
-      },
-    });
+    this.moneyFundSvc
+      .getActivesByCurrentUser()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.loaderSvc.hide())
+      )
+      .subscribe({
+        next: (res) => {
+          this.moneyFunds.set(res.Data ?? []);
+        },
+        error: () => {
+          this.moneyFunds.set([]);
+        },
+      });
   }
 
   private toDateOnlyString(d: Date): string {
@@ -70,24 +75,30 @@ export class DepositComponent {
     }
 
     this.loaderSvc.show();
+    this.submitting = true;
 
     const dto = this.form.getRawValue();
     dto.Date = this.toDateOnlyString(new Date(dto.Date));
 
-    this.depositSvc.create(dto).subscribe({
-      next: (res) => {
-        this.snackBarSvc.success('Deposito creado con éxito.');
+    this.depositSvc
+      .create(dto)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loaderSvc.hide();
+          this.submitting = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.snackBarSvc.success('Deposito creado con éxito.');
 
-        this.form.reset({
-          date: new Date(),
-          amount: 0,
-        });
-        this.loaderSvc.hide();
-      },
-      error: () => {
-        this.loaderSvc.hide();
-      },
-    });
+          this.form.reset({
+            date: new Date(),
+            amount: 0,
+          });
+        },
+      });
   }
 
   get Amount(): AbstractControl<number> | null {

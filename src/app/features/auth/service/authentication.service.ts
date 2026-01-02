@@ -17,8 +17,6 @@ export class AuthenticationService {
     LOGIN: 'Auth/login',
   };
 
-  constructor() {}
-
   registerUser(userData: RegisterValues): Observable<ApiResponse<UserResponse>> {
     return this.httpSvc.post<ApiResponse<UserResponse>>(this.ENDPOINTS.REGISTER, userData).pipe(
       tap((res) => {

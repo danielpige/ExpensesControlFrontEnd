@@ -11,8 +11,6 @@ export class ExpenseTypeService {
 
   private baseUrl = 'ExpenseTypes';
 
-  constructor() {}
-
   getActives() {
     return this.httpSvc.get<ApiResponse<ExpenseType[]>>(`${this.baseUrl}/actives`);
   }

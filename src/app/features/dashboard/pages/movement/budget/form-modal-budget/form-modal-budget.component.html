@@ -24,7 +24,7 @@
           </mat-option>
           }
         </mat-select>
-        <mat-error> Expense type is required. </mat-error>
+        <mat-error> El tipo de gasto es requerido. </mat-error>
       </mat-form-field>
     </div>
 
@@ -41,5 +41,5 @@
 
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Cerrar</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()">Guardar cambios</button>
+  <button mat-raised-button color="primary" [disabled]="submitting" (click)="onSubmit()">Guardar cambios</button>
 </mat-dialog-actions>

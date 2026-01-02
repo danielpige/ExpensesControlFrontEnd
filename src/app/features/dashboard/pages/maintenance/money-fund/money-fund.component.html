@@ -5,67 +5,13 @@
 
 <mat-divider></mat-divider>
 
-<div class="flex justify-end my-3 mx-3">
-  <button mat-fab color="primary" (click)="loadMoneyFunds()">
-    <mat-icon>cached</mat-icon>
-  </button>
-</div>
-
-@if (dataSource().length > 0) {
-<mat-card class="mx-4">
-  <table mat-table [dataSource]="dataSource()" class="mat-elevation-z1 w-full">
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Nombre</th>
-      <td mat-cell *matCellDef="let row">{{ row.Name }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="accountType">
-      <th mat-header-cell *matHeaderCellDef>Tipo de cuenta</th>
-      <td mat-cell *matCellDef="let row">{{ row.AccountType | accountTypeTranslate }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="currentBalance">
-      <th mat-header-cell *matHeaderCellDef>Balance</th>
-      <td mat-cell *matCellDef="let row">
-        {{ row.CurrentBalance | number : '1.2-2' }}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="isActive">
-      <th mat-header-cell *matHeaderCellDef>Estado</th>
-      <td mat-cell *matCellDef="let row">
-        <mat-icon color="primary" *ngIf="row.IsActive">check_circle</mat-icon>
-        <mat-icon color="warn" *ngIf="!row.IsActive">cancel</mat-icon>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Acciones</th>
-      <td mat-cell *matCellDef="let row">
-        <button mat-icon-button color="primary" (click)="openFormModal(row)">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" (click)="deleteMoneyFund(row)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-  <mat-paginator
-    (page)="chagePagination($event)"
-    [length]="pagination.length"
-    [pageSize]="pagination.pageSize"
-    [pageIndex]="pagination.pageIndex"
-    [pageSizeOptions]="[2, 10, 25, 100]"
-    aria-label="Select page"
-  >
-  </mat-paginator>
-</mat-card>
-} @else {
-<mat-card class="mx-4 p-3">
-  <p class="m-4">No hay datos para mostrar.</p>
-</mat-card>
-}
+<app-generic-table
+  [actions]="actions"
+  [dataSource]="dataSource()"
+  [loading]="loading()"
+  [columns]="columns"
+  [pageEvent]="pageEvent()"
+  (paged)="chagePagination($event)"
+  (selectedAction)="onSelecteAction($event)"
+  (refresh)="forceReload()"
+></app-generic-table>

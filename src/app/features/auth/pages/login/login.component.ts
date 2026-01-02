@@ -1,10 +1,12 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginForm, LoginValues } from '../../../../core/models/user.model';
 import { LoaderService } from '../../../../core/services/loader.service';
 import { AuthenticationService } from '../../service/authentication.service';
 import { Router } from '@angular/router';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -17,11 +19,11 @@ export class LoginComponent implements OnInit {
   private authenticationSvc = inject(AuthenticationService);
   private router = inject(Router);
   private snackBar = inject(SnackBarService);
+  private destroyRef = inject(DestroyRef);
 
   loginForm!: FormGroup<LoginForm>;
   hidePassword = signal(true);
-
-  constructor() {}
+  submitting = false;
 
   ngOnInit(): void {
     this.initForm();
@@ -48,21 +50,26 @@ export class LoginComponent implements OnInit {
     }
 
     this.loaderSvc.show();
+    this.submitting = true;
 
     const data = this.loginForm.value as LoginValues;
 
-    this.authenticationSvc.loginUser(data).subscribe({
-      next: (res) => {
-        if (res.Success) {
-          this.snackBar.success('Has iniciado sesión correctamente.');
+    this.authenticationSvc
+      .loginUser(data)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
           this.loaderSvc.hide();
-          this.router.navigate(['/dashboard']);
-        }
-      },
-      error: (error) => {
-        this.snackBar.error(error.error.message);
-        this.loaderSvc.hide();
-      },
-    });
+          this.submitting = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.Success) {
+            this.snackBar.success('Has iniciado sesión correctamente.');
+            this.router.navigate(['/dashboard']);
+          }
+        },
+      });
   }
 }

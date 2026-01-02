@@ -10,8 +10,6 @@ export class LoaderService {
 
   private dialogRef?: MatDialogRef<LoaderComponent>;
 
-  constructor() {}
-
   show(): void {
     if (!this.dialogRef) {
       this.dialogRef = this.dialog.open(LoaderComponent, {
