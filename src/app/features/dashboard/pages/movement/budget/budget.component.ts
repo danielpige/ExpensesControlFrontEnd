@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { Budget } from '../../../../../core/models/budget.model';
 import { BudgetService } from './budget.service';
 import { LoaderService } from '../../../../../core/services/loader.service';
@@ -11,6 +11,8 @@ import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, finalize } from 'rxjs';
 import { Actions, Columns, ColumnTypes } from '../../../../../shared/components/generic-table/generic-table.type';
+import { PageEvent } from '@angular/material/paginator';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-budget',
@@ -53,7 +55,16 @@ export class BudgetComponent implements OnInit {
     },
   ];
   loading = signal(true);
-  displayedColumns = ['expenseTypeName', 'amount', 'actions'];
+  pageIndex = signal(0);
+  pageSize = signal(10);
+  length = signal(0);
+  refreshKey = signal(0);
+
+  pageEvent = computed<PageEvent>(() => ({
+    pageIndex: this.pageIndex(),
+    pageSize: this.pageSize(),
+    length: this.length(),
+  }));
   date: FormControl<Date | null> = new FormControl(new Date());
 
   months = [
@@ -71,29 +82,48 @@ export class BudgetComponent implements OnInit {
     { value: 12, label: 'Diciembre' },
   ];
 
-  ngOnInit(): void {
-    this.title.setTitle('Presupuestos');
-    this.onSearch();
+  constructor() {
+    effect(
+      (onCleanup) => {
+        const index = this.pageIndex();
+        const size = this.pageSize();
+        this.refreshKey();
+
+        this.loading.set(true);
+
+        const sub = this.onSearch(index, size);
+
+        onCleanup(() => sub.unsubscribe());
+      },
+      {
+        allowSignalWrites: true,
+      }
+    );
   }
 
-  onSearch() {
-    if (!this.selectedYear || !this.selectedMonth) return;
+  ngOnInit(): void {
+    this.title.setTitle('Presupuestos');
+  }
 
-    this.loaderSvc.show();
-    this.loading.set(true);
-
-    this.budgetSvc
-      .getByPeriod(this.selectedYear, this.selectedMonth)
+  onSearch(index: number, size: number) {
+    return this.budgetSvc
+      .getByPeriod(this.selectedYear, this.selectedMonth, index + 1, size)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          this.loaderSvc.hide();
           this.loading.set(false);
         })
       )
       .subscribe({
         next: (res) => {
-          this.dataSource.set(res.Data ?? []);
+          this.dataSource.set(res.Data.Items);
+          this.length.set(res.Data.TotalCount);
+
+          const serverIndex = res.Data.PageNumber - 1;
+          const serverSize = res.Data.PageSize;
+
+          if (this.pageIndex() !== serverIndex) this.pageIndex.set(serverIndex);
+          if (this.pageSize() !== serverSize) this.pageSize.set(serverSize);
         },
         error: () => {
           this.dataSource.set([]);
@@ -116,7 +146,7 @@ export class BudgetComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef), filter(Boolean))
       .subscribe({
         next: () => {
-          this.onSearch();
+          this.forceReload();
         },
       });
   }
@@ -124,8 +154,10 @@ export class BudgetComponent implements OnInit {
   deleteBudget(budget: Budget): void {
     this.loaderSvc.show();
 
+    const key = uuidv4();
+
     this.budgetSvc
-      .delete(budget.Id as number)
+      .delete(budget.Id as number, key)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loaderSvc.hide())
@@ -133,7 +165,7 @@ export class BudgetComponent implements OnInit {
       .subscribe({
         next: () => {
           this.snackBarSvc.success('presupuesto eliminado con éxito.');
-          this.onSearch();
+          this.forceReload();
         },
       });
   }
@@ -158,5 +190,14 @@ export class BudgetComponent implements OnInit {
     if (actionEvent.event === 'delete') {
       this.deleteBudget(actionEvent.item);
     }
+  }
+
+  forceReload(): void {
+    this.refreshKey.update((v) => v + 1);
+  }
+
+  chagePagination(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
   }
 }

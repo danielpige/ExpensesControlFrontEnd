@@ -7,6 +7,7 @@ import { SnackBarService } from '../../../../../../core/services/snack-bar.servi
 import { MoneyFundService } from '../money-fund.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-form-modal-money-fund',
@@ -61,7 +62,8 @@ export class FormModalMoneyFundComponent {
     this.loaderSvc.show();
 
     const dataForm = this.form.getRawValue();
-    const query = this.data ? this.moneyFundSvc.update(this.data.Id as number, dataForm) : this.moneyFundSvc.create(dataForm);
+    const key = uuidv4();
+    const query = this.data ? this.moneyFundSvc.update(this.data.Id as number, dataForm, key) : this.moneyFundSvc.create(dataForm, key);
 
     query
       .pipe(

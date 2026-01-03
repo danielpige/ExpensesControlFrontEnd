@@ -9,6 +9,7 @@ import { LoaderService } from '../../../../../core/services/loader.service';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-movement',
@@ -87,9 +88,10 @@ export class MovementComponent implements OnInit {
     }
 
     this.loaderSvc.show();
+    const key = uuidv4();
 
     this.movementSvc
-      .exportData(this.buildQuery.from, this.buildQuery.to, this.buildQuery.moneyFundId)
+      .exportData(this.buildQuery.from, this.buildQuery.to, key, this.buildQuery.moneyFundId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loaderSvc.hide())

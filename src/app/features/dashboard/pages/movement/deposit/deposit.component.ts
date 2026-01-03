@@ -8,6 +8,7 @@ import { LoaderService } from '../../../../../core/services/loader.service';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-deposit',
@@ -79,9 +80,10 @@ export class DepositComponent {
 
     const dto = this.form.getRawValue();
     dto.Date = this.toDateOnlyString(new Date(dto.Date));
+    const key = uuidv4();
 
     this.depositSvc
-      .create(dto)
+      .create(dto, key)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {

@@ -3,7 +3,6 @@ import { HttpService } from '../../../../../core/services/http.service';
 import { ApiResponse } from '../../../../../core/models/apiResponse.model';
 import { Movement } from '../../../../../core/models/movement.model';
 import { Observable } from 'rxjs';
-import { MoneyFund } from '../../../../../core/models/moneyFund.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +27,7 @@ export class MovementService {
     return this.httpSvc.get<ApiResponse<Movement[]>>(url, params);
   }
 
-  exportData(from: string, to: string, moneyFundId?: number): Observable<Blob> {
+  exportData(from: string, to: string, idempotencyKey: string, moneyFundId?: number): Observable<Blob> {
     let url = `${this.baseUrl}/export`;
     const params = {
       from: from,
@@ -40,6 +39,6 @@ export class MovementService {
       delete params.moneyFundId;
     }
 
-    return this.httpSvc.getBlob(url, params);
+    return this.httpSvc.idempotent(() => this.httpSvc.getBlobReponse(url, params, { idempotencyKey }));
   }
 }

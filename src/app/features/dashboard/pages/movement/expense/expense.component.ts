@@ -13,6 +13,7 @@ import { LoaderService } from '../../../../../core/services/loader.service';
 import { SnackBarService } from '../../../../../core/services/snack-bar.service';
 import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-expense',
@@ -106,9 +107,10 @@ export class ExpenseComponent {
 
     const dto: Expense = this.form.getRawValue();
     dto.Date = this.toDateOnlyString(new Date(dto.Date));
+    const key = uuidv4();
 
     this.expenseSvc
-      .create(dto)
+      .create(dto, key)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {

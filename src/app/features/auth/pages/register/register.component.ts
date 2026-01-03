@@ -8,6 +8,7 @@ import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { passwordMatchValidator } from '../../../../core/utils/validators/password-match.validator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-register',
@@ -59,9 +60,10 @@ export class RegisterComponent implements OnInit {
     this.submitting = true;
 
     const data = this.registerForm.value as RegisterValues;
+    const key = uuidv4();
 
     this.authenticationSvc
-      .registerUser(data)
+      .registerUser(data, key)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {

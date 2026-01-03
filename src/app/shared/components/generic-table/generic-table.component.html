@@ -25,6 +25,7 @@
     </table>
   </div>
   <mat-paginator
+    *ngIf="hasPagination"
     class="w-full"
     itemsPerPageLabel="'Items por pagina'"
     (page)="onChangePaginator($event)"

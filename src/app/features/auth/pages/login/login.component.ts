@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { SnackBarService } from '../../../../core/services/snack-bar.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-login',
@@ -53,9 +54,10 @@ export class LoginComponent implements OnInit {
     this.submitting = true;
 
     const data = this.loginForm.value as LoginValues;
+    const key = uuidv4();
 
     this.authenticationSvc
-      .loginUser(data)
+      .loginUser(data, key)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {

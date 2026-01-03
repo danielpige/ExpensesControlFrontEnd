@@ -10,6 +10,7 @@ import { ExpenseType } from '../../../../../../core/models/expenseType.model';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-form-modal-budget',
@@ -80,7 +81,8 @@ export class FormModalBudgetComponent {
     const dataForm = this.form.getRawValue();
     delete dataForm.Date;
 
-    const query = this.data.data ? this.budgetSvc.update(this.data.data.Id as number, dataForm) : this.budgetSvc.create(dataForm);
+    const key = uuidv4();
+    const query = this.data.data ? this.budgetSvc.update(this.data.data.Id as number, dataForm, key) : this.budgetSvc.create(dataForm, key);
 
     query
       .pipe(

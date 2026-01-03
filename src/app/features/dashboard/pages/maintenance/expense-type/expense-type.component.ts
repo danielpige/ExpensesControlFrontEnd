@@ -10,6 +10,7 @@ import { Title } from '@angular/platform-browser';
 import { Columns, ColumnTypes, Actions } from '../../../../../shared/components/generic-table/generic-table.type';
 import { filter, finalize, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-expense-type',
@@ -109,8 +110,10 @@ export class ExpenseTypeComponent implements OnInit {
   deleteExpense(expenseType: ExpenseType): void {
     this.loaderSvc.show();
 
+    const key = uuidv4();
+
     this.expenseTypeSvc
-      .delete(expenseType.Id as number)
+      .delete(expenseType.Id as number, key)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.loaderSvc.hide())
