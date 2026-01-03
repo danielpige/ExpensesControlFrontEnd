@@ -29,15 +29,17 @@ export class MoneyFundService {
     );
   }
 
-  create(dto: MoneyFund) {
-    return this.httpSvc.post<ApiResponse<MoneyFund>>(this.baseUrl, dto);
+  create(dto: MoneyFund, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() => this.httpSvc.postResponse<ApiResponse<MoneyFund>>(this.baseUrl, dto, { idempotencyKey }));
   }
 
-  update(id: number, dto: MoneyFund) {
-    return this.httpSvc.put<ApiResponse<MoneyFund>>(`${this.baseUrl}/${id}`, dto);
+  update(id: number, dto: MoneyFund, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() =>
+      this.httpSvc.putResponse<ApiResponse<MoneyFund>>(`${this.baseUrl}/${id}`, dto, { idempotencyKey })
+    );
   }
 
-  delete(id: number) {
-    return this.httpSvc.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`);
+  delete(id: number, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() => this.httpSvc.deleteResponse<ApiResponse<void>>(`${this.baseUrl}/${id}`, { idempotencyKey }));
   }
 }

@@ -19,25 +19,27 @@ export class ExpenseTypeService {
     return this.httpSvc.get<ApiResponse<ExpenseType[]>>(`${this.baseUrl}/get-all-by-current-user/actives`);
   }
 
-  getAll(pageindex: number, pageSize: number) {
-    return this.httpSvc.get<ApiResponse<PagedResult<ExpenseType>>>(`${this.baseUrl}?pageNumber=${pageindex}&pageSize=${pageSize}`);
+  getAll(pageIndex: number, pageSize: number) {
+    return this.httpSvc.get<ApiResponse<PagedResult<ExpenseType>>>(`${this.baseUrl}?pageNumber=${pageIndex}&pageSize=${pageSize}`);
   }
 
-  getAllByCurrentUser(pageindex: number, pageSize: number) {
+  getAllByCurrentUser(pageIndex: number, pageSize: number) {
     return this.httpSvc.get<ApiResponse<PagedResult<ExpenseType>>>(
-      `${this.baseUrl}/get-all-by-current-user?pageNumber=${pageindex}&pageSize=${pageSize}`
+      `${this.baseUrl}/get-all-by-current-user?pageNumber=${pageIndex}&pageSize=${pageSize}`
     );
   }
 
-  create(dto: ExpenseType) {
-    return this.httpSvc.post<ApiResponse<ExpenseType>>(this.baseUrl, dto);
+  create(dto: ExpenseType, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() => this.httpSvc.postResponse<ApiResponse<ExpenseType>>(this.baseUrl, dto, { idempotencyKey }));
   }
 
-  update(id: number, dto: ExpenseType) {
-    return this.httpSvc.put<ApiResponse<ExpenseType>>(`${this.baseUrl}/${id}`, dto);
+  update(id: number, dto: ExpenseType, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() =>
+      this.httpSvc.putResponse<ApiResponse<ExpenseType>>(`${this.baseUrl}/${id}`, dto, { idempotencyKey })
+    );
   }
 
-  delete(id: number) {
-    return this.httpSvc.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`);
+  delete(id: number, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() => this.httpSvc.deleteResponse<ApiResponse<void>>(`${this.baseUrl}/${id}`, { idempotencyKey }));
   }
 }

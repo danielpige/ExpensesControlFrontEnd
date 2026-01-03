@@ -11,8 +11,8 @@ export class DepositService {
 
   private baseUrl = 'Deposits';
 
-  create(dto: Deposit) {
-    return this.httpSvc.post<ApiResponse<Deposit>>(this.baseUrl, dto);
+  create(dto: Deposit, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() => this.httpSvc.postResponse<ApiResponse<Deposit>>(this.baseUrl, dto, { idempotencyKey }));
   }
 
   getByDateRange(from: string, to: string) {

@@ -11,7 +11,9 @@ export class ExpenseService {
 
   private baseUrl = 'Expenses';
 
-  create(dto: Expense) {
-    return this.httpSvc.post<ApiResponse<CreateExpenseResponse>>(this.baseUrl, dto);
+  create(dto: Expense, idempotencyKey: string) {
+    return this.httpSvc.idempotent(() =>
+      this.httpSvc.postResponse<ApiResponse<CreateExpenseResponse>>(this.baseUrl, dto, { idempotencyKey })
+    );
   }
 }

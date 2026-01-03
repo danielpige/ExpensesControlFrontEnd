@@ -17,25 +17,23 @@ export class AuthenticationService {
     LOGIN: 'Auth/login',
   };
 
-  registerUser(userData: RegisterValues): Observable<ApiResponse<UserResponse>> {
-    return this.httpSvc.post<ApiResponse<UserResponse>>(this.ENDPOINTS.REGISTER, userData).pipe(
-      tap((res) => {
-        if (res.Success) {
-          this.authSvc.setDataUserLogged(res.Data);
-        }
-        return res;
-      })
-    );
+  registerUser(userData: RegisterValues, idempotencyKey: string): Observable<ApiResponse<UserResponse>> {
+    return this.httpSvc
+      .idempotent(() => this.httpSvc.postResponse<ApiResponse<UserResponse>>(this.ENDPOINTS.REGISTER, userData, { idempotencyKey }))
+      .pipe(
+        tap((res) => {
+          if (res.Success) this.authSvc.setDataUserLogged(res.Data);
+        })
+      );
   }
 
-  loginUser(userData: LoginValues): Observable<ApiResponse<UserResponse>> {
-    return this.httpSvc.post<ApiResponse<UserResponse>>(this.ENDPOINTS.LOGIN, userData).pipe(
-      tap((res) => {
-        if (res.Success) {
-          this.authSvc.setDataUserLogged(res.Data);
-        }
-        return res;
-      })
-    );
+  loginUser(userData: LoginValues, idempotencyKey: string): Observable<ApiResponse<UserResponse>> {
+    return this.httpSvc
+      .idempotent(() => this.httpSvc.postResponse<ApiResponse<UserResponse>>(this.ENDPOINTS.LOGIN, userData, { idempotencyKey }))
+      .pipe(
+        tap((res) => {
+          if (res.Success) this.authSvc.setDataUserLogged(res.Data);
+        })
+      );
   }
 }

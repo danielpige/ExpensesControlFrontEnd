@@ -11,6 +11,7 @@ import { Actions, Columns, ColumnTypes } from '../../../../../shared/components/
 import { AccountTypeTranslatePipe } from '../../../../../shared/pipes/account-type-translate.pipe';
 import { filter, finalize, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-money-fund',
@@ -117,8 +118,10 @@ export class MoneyFundComponent {
   deleteMoneyFund(moneyFund: MoneyFund): void {
     this.loaderSvc.show();
 
+    const key = uuidv4();
+
     this.moneyFundSvc
-      .delete(moneyFund.Id as number)
+      .delete(moneyFund.Id as number, key)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

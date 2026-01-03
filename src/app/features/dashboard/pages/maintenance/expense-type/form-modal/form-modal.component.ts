@@ -7,6 +7,7 @@ import { ExpenseTypeService } from '../expense-type.service';
 import { SnackBarService } from '../../../../../../core/services/snack-bar.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-form-modal',
@@ -50,9 +51,11 @@ export class FormModalComponent implements OnInit {
     }
 
     this.loaderSvc.show();
+    this.submitting = true;
 
     const dataForm = this.form.getRawValue();
-    const query = this.data ? this.expenseTypeSvc.update(this.data.Id as number, dataForm) : this.expenseTypeSvc.create(dataForm);
+    const key = uuidv4();
+    const query = this.data ? this.expenseTypeSvc.update(this.data.Id as number, dataForm, key) : this.expenseTypeSvc.create(dataForm, key);
 
     query
       .pipe(

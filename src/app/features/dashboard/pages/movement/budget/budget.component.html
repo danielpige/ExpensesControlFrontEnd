@@ -6,7 +6,7 @@
 <mat-divider></mat-divider>
 
 <mat-card class="mt-3 mx-4 px-4">
-  <form class="grid grid-cols-3 py-4" (ngSubmit)="onSearch()">
+  <form class="grid grid-cols-3 py-4" (ngSubmit)="forceReload()">
     <div class="m-2">
       <mat-form-field appearance="outline" class="w-full">
         <mat-label>Mes y año</mat-label>
@@ -32,6 +32,7 @@
   [loading]="loading()"
   [columns]="columns"
   (selectedAction)="onSelecteAction($event)"
-  (refresh)="onSearch()"
-  [hasPagination]="false"
+  (refresh)="forceReload()"
+  [pageEvent]="pageEvent()"
+  (paged)="chagePagination($event)"
 ></app-generic-table>
